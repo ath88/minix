@@ -159,6 +159,11 @@ PUBLIC void kernel_call(message *m_user, struct proc * caller)
 	  return;
   }
 
+  #ifdef EBPROFILE
+  
+  // Magic
+  
+  #endif /* EBPROFILE */
   
   /* remember who invoked the kcall so we can bill it its time */
   kbill_kcall = caller;
