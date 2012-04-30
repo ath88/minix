@@ -12,7 +12,7 @@ int *alloc_buffers (void);
 int*
 alloc_buffers ()
 {
-  buffer = malloc (sizeof(kcall_sample));
+  buffer = malloc (sizeof (kcall_sample));
 
   if (buffer == 0)
     {
@@ -22,9 +22,9 @@ alloc_buffers ()
     }
   else
     {
-      memset (buffer, '\0', sizeof(kcall_sample));
+      memset (buffer, '\0', sizeof (kcall_sample));
     }
-	return buffer;
+  return buffer;
 }
 
 #endif /* EBPROFILE */

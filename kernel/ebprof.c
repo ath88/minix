@@ -18,7 +18,10 @@ extern int *sec_buf;
 int
 start()
 {
-	alloc_buffers();
+	pri_buf = alloc_buffers();
+	sec_buf = alloc_buffers();
+
+	/* Start profiling in kernel */	
 	return 0;
 }
 
