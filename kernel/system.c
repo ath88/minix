@@ -160,10 +160,7 @@ PUBLIC void kernel_call(message *m_user, struct proc * caller)
   }
 
   #ifdef EBPROFILE
-  
-  // Magic
-  collect()
-  
+  collect(m_user, caller);
   #endif /* EBPROFILE */
   
   /* remember who invoked the kcall so we can bill it its time */

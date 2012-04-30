@@ -27,7 +27,7 @@ start()
 
 /* Write profiling information to buffer */
 int
-collect(char* kcall, int size)
+collect (message *m_user, struct proc *caller)
 {
 	return 0;
 }

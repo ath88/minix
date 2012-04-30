@@ -6,6 +6,7 @@
 
 #include "com.h"
 #include "priv.h"
+#include "kernel.h"
 
 #if EBPROFILE
 
@@ -22,7 +23,7 @@ struct
 } kcall_sample;
 
 int initialize (void);
-int collect (char* kcall, int size);
+int collect (message *m_user, struct proc *caller);
 int alloc_buffers (void);
 
 #endif /* EBPROF_H */
