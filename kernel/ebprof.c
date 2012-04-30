@@ -11,7 +11,6 @@ int buf_size = 0;
 int *pri_buf;
 int *sec_buf;
 
-
 /* Allocates memory for double buffering */
 int
 alloc_buffers ()
