@@ -4,12 +4,30 @@
 
 #include "ebprof.h"
 
+#if EBPROFILE
 
+int initialize (void);
+int collect (char* kcall, int size);
 int alloc_buffers (void);
 
 int buf_size = 0;
-int *pri_buf;
-int *sec_buf;
+extern int *pri_buf;
+extern int *sec_buf;
+
+/* Initializes datastructures used for profiling */
+int
+initialize()
+{
+	alloc_buffers();
+	return 0;
+}
+
+/* Write profiling information to buffer */
+int
+collect(char* kcall, int size)
+{
+	return 0;
+}
 
 /* Allocates memory for double buffering */
 int
@@ -29,5 +47,7 @@ alloc_buffers ()
       memset (pri_buf, '\0', buf_size);
       memset (sec_buf, '\0', buf_size);
     }
-
+	return 0;
 }
+
+#endif /* EBPROFILE */

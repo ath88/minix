@@ -15,4 +15,8 @@ struct
   char *params[256];
 } kcall_sample;
 
+int initialize (void);
+int collect (char* kcall, int size);
+int alloc_buffers (void);
+
 #endif /* EBPROF_H */
