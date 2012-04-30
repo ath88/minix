@@ -6,84 +6,120 @@
 
 #if EBPROFILE
 
-int start (void);
-int collect (void);
-int alloc_buffers (void);
+#define HELP  0
+#define START 1
+#define STOP  2
+#define GET   3
 
 int buf_size = 0;
+int outfile = 0;
+
 extern int *pri_buf;
 extern int *sec_buf;
 
+int start (void);
+int stop (void);
+int get (void);
+int help (void);
+int collect (void);
+int handle_args (int argc, char *argv[]);
+int alloc_buffers (void);
+
 /* Starts event-based profiling. */
 int
-main(int argc, char* argv[])
+main (int argc, char *argv[])
 {
-	handle_args(argc, argv);
+  int action;
+
+  setprogname (argv[0]);
+
+  action = handle_args (argc, argv);
+  switch (action)
+    {
+    case HELP:
+      help ();
+    case START:
+      start ();
+    case STOP:
+      stop ();
+    case GET:
+      get ();
+    default:
+      printf ("Incorrect arguments.\n");
+      help ();
+    }
 }
 
 /* Initializes datastructures used for profiling. */
 int
-start()
+start ()
 {
-	pri_buf = alloc_buffers();
-	sec_buf = alloc_buffers();
+  pri_buf = alloc_buffers ();
+  sec_buf = alloc_buffers ();
 
-	/* Start profiling in kernel */	
-	return 0;
+  /* Start profiling in kernel */
+  return 0;
+}
+
+/* Stops event-based profiling in MINIX. */
+int
+stop ()
+{
+  return 0;
+}
+
+/* Print current profiling information. */
+int
+get ()
+{
+  return 0;
+}
+
+/* Prints help. */
+int
+help ()
+{
+  printf ("Event-based profiling:\n")
+    printf ("  ebprofile start [-o outfile]\n");
+  printf ("  ebprofile stop\n");
+  printf ("  ebprofile get [-o outfile]\n");
+  printf ("Use ebprofalyze.pl to analyze output file.\n");
+  return 0;
 }
 
 /* Write profiling information to buffer */
 int
-collect (message *m_user, struct proc *caller)
+collect (message * m_user, struct proc *caller)
 {
-	return 0;
+  return 0;
 }
 
-/* Handle arguments */
+/* Handle arguments for ebprofile. */
 int
-handle_args(int argc, char* argv[])
+handle_args (int argc, char *argv[])
 {
-
-while (--argc) {
-        ++argv;
-
-        if (strcmp(*argv, "-h") == 0 || strcmp(*argv, "help") == 0 ||
-                strcmp(*argv, "--help") == 0) {
-                return EHELP;
-        } else
-        if (strcmp(*argv, "-m") == 0) {
-                if (--argc == 0) return ESYNTAX;
-                if (sscanf(*++argv, "%u", &mem_size) != 1 ||
-                        mem_size < MIN_MEMSIZE ) return EMEM;
-        } else
-        if (strcmp(*argv, "-f") == 0) {
-                if (--argc == 0) return ESYNTAX;
-                if (sscanf(*++argv, "%u", &freq) != 1)
-                        return EFREQ;
-        } else
-        if (strcmp(*argv, "-o") == 0) {
-                if (--argc == 0) return ESYNTAX;
-                outfile = *++argv;
-        } else
-        if (strcmp(*argv, "--rtc") == 0) {
-                intr_type = PROF_RTC;
-        } else
-        if (strcmp(*argv, "--nmi") == 0) {
-                intr_type = PROF_NMI;
-        } else
-        if (strcmp(*argv, "start") == 0) {
-                if (action) return EACTION;
-                action = START;
-        } else
-        if (strcmp(*argv, "stop") == 0) {
-                if (action) return EACTION;
-                action = STOP;
-        } else
-        if (strcmp(*argv, "get") == 0) {
-                if (action) return EACTION;
-                action = GET;
-}
-
+  while (--argc)
+    {
+      ++argv;
+      if (strcmp (*argv, "-h") == 0 || strcmp (*argv, "help") == 0 ||
+	  strcmp (*argv, "--help") == 0)
+	{
+	  return HELP;
+	}
+      else if (strcmp (*argv, "start") == 0)
+	{
+	  return START;
+	}
+      else if (strcmp (*argv, "stop") == 0)
+	{
+	  return STOP;
+	}
+      else if (strcmp (*argv, "get") == 0)
+	{
+	  return GET;
+	}
+      return -1;
+    }
 }
 
 #endif
