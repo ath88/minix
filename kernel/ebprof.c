@@ -7,6 +7,7 @@
 
 int alloc_buffers (void);
 
+int buf_size = 0;
 int *pri_buf;
 int *sec_buf;
 
@@ -15,8 +16,8 @@ int *sec_buf;
 int
 alloc_buffers ()
 {
-  pri_buf = malloc (BUFFER_SIZE);
-  sec_buf = malloc (BUFFER_SIZE);
+  pri_buf = malloc (buf_size);
+  sec_buf = malloc (buf_size);
 
   if (pri_buf == 0 || sec_buf == 0)
     {
@@ -26,8 +27,8 @@ alloc_buffers ()
     }
   else
     {
-      memset (pri_buf, '\0', BUFFER_SIZE);
-      memset (sec_buf, '\0', BUFFER_SIZE);
+      memset (pri_buf, '\0', buf_size);
+      memset (sec_buf, '\0', buf_size);
     }
 
 }
