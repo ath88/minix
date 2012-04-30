@@ -5,14 +5,20 @@
 */
 
 #include "com.h"
+#include "priv.h"
+
 #if EBPROFILE
 
 struct
 {
   int time;
   int kcall;
-  char *callee[256];
-  char *params[256];
+  int pid;
+  int *params[12];
+  /* from kernel/proc.c */
+  unsigned cpu;
+  char p_priority;
+  struct priv *p_priv;  
 } kcall_sample;
 
 int initialize (void);

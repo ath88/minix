@@ -162,6 +162,7 @@ PUBLIC void kernel_call(message *m_user, struct proc * caller)
   #ifdef EBPROFILE
   
   // Magic
+  collect()
   
   #endif /* EBPROFILE */
   
