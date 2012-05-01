@@ -2,6 +2,8 @@
  * in MINIX 3. 
  */
 
+// Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
+
 #include "ebprof.h"
 
 #if EBPROFILE
@@ -9,8 +11,8 @@
 #define HELP  0
 #define START 1
 #define STOP  2
-#define GET   3
 
+// TODO fix buffer size
 int buf_size = 0;
 int outfile = 0;
 
@@ -62,29 +64,22 @@ start ()
 }
 
 /* Stops event-based profiling in MINIX. */
+// TODO pkill process, if exists. probably needs to report back to user what happened
 int
 stop ()
 {
   return 0;
 }
 
-/* Print current profiling information. */
-int
-get ()
-{
-  return 0;
-}
-
 /* Prints help. */
-int
+void
 help ()
 {
   printf ("Event-based profiling:\n")
-    printf ("  ebprofile start [-o outfile]\n");
+  printf ("  ebprofile start [-f filename | -n ip:port] [-d]\n");
   printf ("  ebprofile stop\n");
-  printf ("  ebprofile get [-o outfile]\n");
   printf ("Use ebprofalyze.pl to analyze output file.\n");
-  return 0;
+  return;
 }
 
 /* Write profiling information to buffer */
@@ -114,11 +109,8 @@ handle_args (int argc, char *argv[])
 	{
 	  return STOP;
 	}
-      else if (strcmp (*argv, "get") == 0)
-	{
-	  return GET;
-	}
-      return -1;
+}
+      return HELP;
     }
 }
 
