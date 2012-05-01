@@ -1,5 +1,4 @@
  * in MINIX 3. 
- */
 
 // Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
 
@@ -61,8 +60,13 @@ start ()
   sec_buf = alloc_buffers ();
 
   /* Start profiling in kernel */
-  do_ebprof();  
+  do_ebprofile();  
 
+  // Loop consumer, read buffers and write to file or socket (SUCK IT!) 
+  while (1)
+  {
+
+  }
   return 0;
 }
 
