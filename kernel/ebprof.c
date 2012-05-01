@@ -16,7 +16,7 @@
 int buf_size = 0;
 int outfile = 0;
 
-extern int *pri_buf;
+extern int *fir_buf;
 extern int *sec_buf;
 
 int start (void);
@@ -56,11 +56,11 @@ main (int argc, char *argv[])
 int
 start ()
 {
-  pri_buf = alloc_buffers ();
+  fir_buf = alloc_buffers ();
   sec_buf = alloc_buffers ();
 
   /* Start profiling in kernel */
-  do_ebprofile();  
+  do_ebprofile(fir_buf, sec_buf);  
 
   // Loop consumer, read buffers and write to file or socket (SUCK IT!) 
   while (1)
