@@ -1,10 +1,11 @@
-/* This file implements event-based profiling
  * in MINIX 3. 
  */
 
 // Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
 
 #include "ebprof.h"
+#include <sys/signal.h>
+#include <signal.h>
 
 #if EBPROFILE
 
@@ -60,6 +61,8 @@ start ()
   sec_buf = alloc_buffers ();
 
   /* Start profiling in kernel */
+  do_ebprof();  
+
   return 0;
 }
 
@@ -68,6 +71,9 @@ start ()
 int
 stop ()
 {
+
+  sigaction(SIGKILL); // Read docs, noobz
+  
   return 0;
 }
 
@@ -85,7 +91,11 @@ help ()
 /* Write profiling information to buffer */
 int
 collect (message * m_user, struct proc *caller)
-{
+{ 
+  
+  /* Fill sample with information */
+  
+
   return 0;
 }
 
