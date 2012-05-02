@@ -48,4 +48,3 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
 }
 
 #endif /* EBPROFILE */
-

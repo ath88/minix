@@ -254,6 +254,7 @@ PUBLIC void system_init(void)
   map(SYS_SPROF, do_sprofile);         /* start/stop statistical profiling */
   map(SYS_CPROF, do_cprofile);         /* get/reset call profiling data */
   map(SYS_PROFBUF, do_profbuf);        /* announce locations to kernel */
+  map(SYS_EBPROFILE, do_ebprofile);    /* collect data from probe */
 
   /* i386-specific. */
 #if _MINIX_CHIP == _CHIP_INTEL
