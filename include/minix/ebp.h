@@ -1,7 +1,8 @@
 #ifndef EBPROF_H
 #define EBPROF_H
 
-/* This header file defines ...
+/* This header file defines types and structures
+*  for event-based profiling.
 */
 
 #include "com.h"
@@ -9,6 +10,8 @@
 #include "kernel.h"
 
 #if EBPROFILE
+
+#define TRACE_PROBE(provider, 
 
 struct
 {

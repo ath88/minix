@@ -1,4 +1,6 @@
+/* Blah
  * in MINIX 3. 
+ */
 
 // Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
 
@@ -52,7 +54,7 @@ main (int argc, char *argv[])
     }
 }
 
-/* Initializes datastructures used for profiling. */
+/* Initializes buffers and starts profiling. */
 int
 start ()
 {
@@ -90,17 +92,6 @@ help ()
   printf ("  ebprofile stop\n");
   printf ("Use ebprofalyze.pl to analyze output file.\n");
   return;
-}
-
-/* Write profiling information to buffer */
-int
-collect (message * m_user, struct proc *caller)
-{ 
-  
-  /* Fill sample with information */
-  
-
-  return 0;
 }
 
 /* Handle arguments for ebprofile. */
