@@ -800,6 +800,7 @@ struct
 	int call_nr;
 } system_tab[]=
 {
+	{ "EBPROF",		SYS_EBPROF },
 	{ "PRIVCTL",		SYS_PRIVCTL },
 	{ "TRACE",		SYS_TRACE },
 	{ "KILL",		SYS_KILL },

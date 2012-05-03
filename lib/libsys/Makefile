@@ -110,6 +110,8 @@ SRCS=  \
 	sys_voutw.c \
 	sys_vsafecopy.c \
 	sys_vtimer.c \
+	sys_vumap.c \
+	sys_ebprof.c \
 	taskcall.c \
 	tickdelay.c \
 	timers.c \
@@ -127,6 +129,7 @@ SRCS=  \
 	vm_umap.c \
 	vm_yield_get_block.c \
 	vprintf.c \
+	
 
 .if ${MKCOVERAGE} != "no"
 SRCS+=	gcov.c \

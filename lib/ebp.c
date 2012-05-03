@@ -18,37 +18,24 @@ int get (void);
 int collect (void);
 int *alloc_buffers (void);
 
-/* Starts event-based profiling. */
+/* Initializes datastructures used for profiling. */
 int
-main (int argc, char *argv[])
+start ()
 {
-  int action;
+  fir_buf = alloc_buffers();
+  sec_buf = alloc_buffers();
+  do_ebprofile();
 
-  setprogname (argv[0]);
-
-  action = handle_args (argc, argv);
-  switch (action)
-    {
-    case HELP:
-      help ();
-    case START:
-      start ();
-    case STOP:
-      stop ();
-    case GET:
-      get ();
-    default:
-      printf ("Incorrect arguments.\n");
-      help ();
-    }
+  return 0;
 }
 
-/* Initializes datastructures used for profiling. */
+/*  Stops profiling and deallocates memory. */
 int
 stop ()
 {
   return 0;
 }
+
 
 /* Write current profiling information to buffer. */
 int
@@ -68,7 +55,7 @@ collect (message * m_user, struct proc *caller)
 int*
 alloc_buffers ()
 {
-  buffer = malloc (sizeof (kcall_sample));
+  buffer = malloc (sizeof (kcall_sample[1024]));
 
   if (buffer == 0)
     {
@@ -78,7 +65,7 @@ alloc_buffers ()
     }
   else
     {
-      memset (buffer, '\0', sizeof (kcall_sample));
+      memset (buffer, '\0', sizeof (kcall_sample[1024]));
     }
   return buffer;
 }
