@@ -11,15 +11,17 @@
 
 #if EBPROFILE
 
-#define EBP_PM     1
-#define EBP_SIGH   2
-#define EBP_MEM    3
-#define EBP_COPY   4
-#define EBP_SHAD   5
-#define EBP_DEVIO  6
-#define EBP_SYSCTL 7
-#define EBP_CLOCK  8
-#define EBP_PROF   9
+#define FLAG_AT(x) 0x1 << (x-1)
+
+#define EBP_PM     FLAG_AT(1)
+#define EBP_SIGH   FLAG_AT(2)
+#define EBP_MEM    FLAG_AT(3)
+#define EBP_COPY   FLAG_AT(4)
+#define EBP_SHAD   FLAG_AT(5)
+#define EBP_DEVIO  FLAG_AT(6)
+#define EBP_SYSCTL FLAG_AT(7)
+#define EBP_CLOCK  FLAG_AT(8)
+#define EBP_PROF   FLAG_AT(9)
 
 EXTERN int ebp_bm; /* bitmap for profiling flags */
 
@@ -41,10 +43,9 @@ struct typedef
   void *second;
 } ebp_buffers;
 
-int ebp_start (void);
+int ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
-int ebp_initialize (void);
 int ebp_collect (message *m_user, struct proc *caller);
 int *alloc_buffers (void);
 
