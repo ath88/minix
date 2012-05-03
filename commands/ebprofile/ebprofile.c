@@ -23,7 +23,6 @@ extern int *sec_buf;
 
 int start (void);
 int stop (void);
-int get (void);
 int help (void);
 int collect (void);
 int handle_args (int argc, char *argv[]);
