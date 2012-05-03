@@ -6,9 +6,6 @@
 
 #if EBPROFILE
 
-extern int *fir_buf;
-extern int *sec_buf;
-
 int start (void);
 int stop (void);
 int get (void);
@@ -17,37 +14,34 @@ int *alloc_buffers (void);
 
 /* Initializes datastructures used for profiling. */
 int
-start ()
+ebp_start ()
 {
-  fir_buf = alloc_buffers();
-  sec_buf = alloc_buffers();
+  epb_buffers *buffers;
+  
+  buffers->first  = alloc_buffers();
+  buffers->second = alloc_buffers();
 
-  sys_ebprof(caller, msg);
+  // Create bitmap here
+  
+  /* do syscall */ 
+  sys_ebprof(buffers->first, buffers->second, epb_bm);
 
-  return 0;
+  return buffers;
 }
 
 /*  Stops profiling and deallocates memory. */
 void
 stop ()
 {
-  disable_ebprof();
+  sys_ebprof(NULL, NULL, 0b0); // Check binary
   return;
 }
 
 
 /* Write current profiling information to buffer. */
 int
-get (void *buffer)
+ebp_get (void *buffer)
 {
-  return 0;
-}
-
-/* Write profiling information to buffer */
-int
-collect (message * m_user, struct proc *caller)
-{
-  
   return 0;
 }
 
@@ -69,41 +63,4 @@ alloc_buffers ()
     }
   return buffer;
 }
-
-/* Returns pointer to active buffer */
-int*
-active_buffer()
-{
-
-}
-
-/* Returns pointer to inactive buffer */
-int*
-inactive_buffer()
-{
-
-}
-
-
-/* Returns whether or not profiling is enabled */
-int
-ebprofiling()
-{
-	return ebp_bm & 1;
-}
-
-/* Enable event-based profiling */
-int
-enable_ebprof()
-{
-	return ebp_bm |= 1;
-}
-
-/* Disable event-based profiling */
-int
-disable_ebprof()
-{
-	return ebp_bm &= 0;
-}
-
 #endif /* EBPROFILE */

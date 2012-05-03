@@ -35,11 +35,17 @@ struct
   struct priv *p_priv;  
 } kcall_sample;
 
-int start (void);
-void stop (void);
-int get (void *buffer);
-int initialize (void);
-int collect (message *m_user, struct proc *caller);
+struct typedef
+{
+  void *first;
+  void *second;
+} ebp_buffers;
+
+int ebp_start (void);
+void ebp_stop (void);
+int ebp_get (void *buffer);
+int ebp_initialize (void);
+int ebp_collect (message *m_user, struct proc *caller);
 int *alloc_buffers (void);
 
 #endif /* EBPROF_H */

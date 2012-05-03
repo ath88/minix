@@ -161,7 +161,7 @@ PUBLIC void kernel_call(message *m_user, struct proc * caller)
 
   #ifdef EBPROFILE
   if (ebprofiling() == 1)
-  	collect(m_user, caller);
+  	ebp_collect(m_user, caller);
   #endif /* EBPROFILE */
   
   /* remember who invoked the kcall so we can bill it its time */
