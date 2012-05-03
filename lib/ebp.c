@@ -6,34 +6,34 @@
 
 #if EBPROFILE
 
-int start (void);
-int stop (void);
-int get (void);
-int collect (void);
+int ebp_start (int bitmap);
+void ebp_stop (void);
+int ebp_get (void *buffer);
 int *alloc_buffers (void);
 
 /* Initializes datastructures used for profiling. */
 int
-ebp_start ()
+ebp_start (int bitmap)
 {
   epb_buffers *buffers;
   
   buffers->first  = alloc_buffers();
   buffers->second = alloc_buffers();
 
-  // Create bitmap here
-  
+  /* Set profiling flag */
+  bitmap &= 0x1;
+ 
   /* do syscall */ 
-  sys_ebprof(buffers->first, buffers->second, epb_bm);
+  sys_ebprof(buffers->first, buffers->second, bitmap);
 
   return buffers;
 }
 
-/*  Stops profiling and deallocates memory. */
+/*  Stops profiling. */
 void
-stop ()
+ebp_stop (void)
 {
-  sys_ebprof(NULL, NULL, 0b0); // Check binary
+  sys_ebprof(NULL, NULL, 0x0);
   return;
 }
 
@@ -48,9 +48,9 @@ ebp_get (void *buffer)
 
 /* Allocates memory for double buffering */
 int*
-alloc_buffers ()
+alloc_buffers (void)
 {
-  buffer = malloc (sizeof (kcall_sample[1024]));
+  buffer = malloc (sizeof (kcall_sample[BUFFER_SIZE]));
 
   if (buffer == 0)
     {
@@ -60,7 +60,7 @@ alloc_buffers ()
     }
   else
     {
-      memset (buffer, '\0', sizeof (kcall_sample[1024]));
+      memset (buffer, '\0', sizeof (kcall_sample[BUFFER_SIZE]));
     }
   return buffer;
 }

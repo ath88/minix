@@ -22,7 +22,7 @@ extern int *second;
 // LOOK AT ALL COMMENTS
 // 
 
-int
+void
 set_ebprof(bitmap)
 {
 	// SET BITMAP

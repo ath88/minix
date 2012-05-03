@@ -23,6 +23,8 @@
 #define EBP_CLOCK  FLAG_AT(8)
 #define EBP_PROF   FLAG_AT(9)
 
+#define BUFFER_SIZE	1024
+
 EXTERN int ebp_bm; /* bitmap for profiling flags */
 
 struct
@@ -43,10 +45,16 @@ struct typedef
   void *second;
 } ebp_buffers;
 
+/* kernel functions */
+void set_ebprof(int bitmap);
+int *active_buffer(void);
+void ebprofiling(void);
+int ebp_collect (message *m_user, struct proc *caller);
+
+/* userland functions */
 int ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
-int ebp_collect (message *m_user, struct proc *caller);
 int *alloc_buffers (void);
 
 #endif /* EBPROF_H */
