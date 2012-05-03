@@ -42,6 +42,11 @@ PUBLIC void bsp_finish_booting(void)
 #if SPROFILE
   sprofiling = 0;      /* we're not profiling until instructed to */
 #endif /* SPROFILE */
+
+#if EBPROFILE
+  ebp_bm = 0;          /* allocate bitmap only if needed */
+#endif /* EBPROFILE */
+
   cprof_procs_no = 0;  /* init nr of hash table slots used */
 
   cpu_identify();
