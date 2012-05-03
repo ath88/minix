@@ -12,9 +12,15 @@ extern int *second;
 // BUFFER MANAGEMENT
 // Make first/second in kernel, set first second buffers when system is called
 // ebp.c fix binary
+// BINARY macro?
 // fix binary in header
 // fix prototypes
 // FIX EXTERN FIRST AND SECOND
+// READ DTRACE DOCS
+// Shared locks + shared buffer = happiness
+//     Need to get clock in kernel and userland
+// LOOK AT ALL COMMENTS
+// 
 
 int
 set_ebprof(bitmap)
@@ -25,13 +31,6 @@ set_ebprof(bitmap)
 /* Returns pointer to active buffer */
 int*
 active_buffer()
-{
-
-}
-
-/* Returns pointer to inactive buffer */
-int*
-inactive_buffer()
 {
 
 }

@@ -41,7 +41,8 @@ stop ()
 /* Write current profiling information to buffer. */
 int
 ebp_get (void *buffer)
-{
+{  
+  // Try to get lock, if it gets
   return 0;
 }
 
