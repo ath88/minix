@@ -2,12 +2,9 @@
 *  event-based profiling in MINIX 3. 
 */
 
-#include "ebprof.h"
+#include "ebp.h"
 
 #if EBPROFILE
-
-int buf_size = 0;
-int outfile = 0;
 
 extern int *fir_buf;
 extern int *sec_buf;
@@ -24,22 +21,24 @@ start ()
 {
   fir_buf = alloc_buffers();
   sec_buf = alloc_buffers();
-  do_ebprofile();
+
+  sys_ebprof(caller, msg);
 
   return 0;
 }
 
 /*  Stops profiling and deallocates memory. */
-int
+void
 stop ()
 {
-  return 0;
+  disable_ebprof();
+  return;
 }
 
 
 /* Write current profiling information to buffer. */
 int
-get ()
+get (void *buffer)
 {
   return 0;
 }
@@ -48,6 +47,7 @@ get ()
 int
 collect (message * m_user, struct proc *caller)
 {
+  
   return 0;
 }
 
@@ -68,6 +68,42 @@ alloc_buffers ()
       memset (buffer, '\0', sizeof (kcall_sample[1024]));
     }
   return buffer;
+}
+
+/* Returns pointer to active buffer */
+int*
+active_buffer()
+{
+
+}
+
+/* Returns pointer to inactive buffer */
+int*
+inactive_buffer()
+{
+
+}
+
+
+/* Returns whether or not profiling is enabled */
+int
+ebprofiling()
+{
+	return ebp_bm & 1;
+}
+
+/* Enable event-based profiling */
+int
+enable_ebprof()
+{
+	return ebp_bm |= 1;
+}
+
+/* Disable event-based profiling */
+int
+disable_ebprof()
+{
+	return ebp_bm &= 0;
 }
 
 #endif /* EBPROFILE */
