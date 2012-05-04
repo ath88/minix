@@ -31,7 +31,7 @@ struct
 {
   int time;
   int kcall;
-  int pid;
+  int p_nr;
   int *params[12];
   /* from kernel/proc.c */
   unsigned cpu;
