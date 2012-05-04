@@ -265,7 +265,7 @@ _PROTOTYPE( int sys_sprof, (int action, int size, int freq, int type,
 _PROTOTYPE( int sys_cprof, (int action, int size, endpoint_t endpt,
                                        void *ctl_ptr, void *mem_ptr)    );
 _PROTOTYPE( int sys_profbuf, (void *ctl_ptr, void *mem_ptr)             );
-_PROTOTYPE( int sys_ebprof(void *ctl_ptr, void *mem_ptr)                );
+_PROTOTYPE( int sys_ebprof, (void *ctl_ptr, void *mem_ptr)                );
 
 /* machine context */
 _PROTOTYPE( int sys_getmcontext, (endpoint_t proc, mcontext_t *mcp)	);
