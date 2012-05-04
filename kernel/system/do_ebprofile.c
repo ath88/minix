@@ -32,12 +32,14 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
     first = NULL;
     second = NULL;
     active_buffer = NULL;
+    inactive_buffer = NULL;
 
     return(OK);
   }
 
   /* if not, enable and set buffer & flags appropriately */
   active_buffer = buffer1;
+  inactive_buffer = buffer2;
   first  = buffer1;
   second = buffer2; 
 
