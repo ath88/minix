@@ -25,7 +25,8 @@ extern int *second;
 void
 set_ebprof(bitmap)
 {
-	// SET BITMAP
+	ebp_bm = bitmap;
+	return;
 }
 
 /* Returns pointer to active buffer */
