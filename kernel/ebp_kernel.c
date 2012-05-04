@@ -41,10 +41,10 @@ set_ebprof(int bitmap)
 int*
 active_buffer()
 {
-	int *tmp;
+	//int *tmp;
 	
 	/* swap if full active buffer or consumer is starving */
-	if (reached == BUFFER_SIZE || time)
+	if (reached == BUFFER_SIZE) //|| time)
 	{
 		tmp = active_buffer;
 		active_buffer = inactive_buffer;
@@ -69,11 +69,7 @@ ebp_collect (message * m_user, struct proc *caller)
 {
   int *current_buffer;
   struct kcall_sample *sample;
-
-  if (buffer_mutex != NULL)
-	mutex_destroy(buffer_mutex);	
-  mutex_init(buffer_mutex, MUTEX_DEFAULT, IPL_NONE);
-	
+  
   /* Collect profiling data */ 
   sample->time		=
   sample->kcall 	=
