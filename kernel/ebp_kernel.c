@@ -8,8 +8,10 @@
 
 extern int *first;
 extern int *second;
-extern int reached; /* Where we are in the buffer */
+extern int reached = 0; /* Where we are in the buffer */
 extern struct kmutex buffer_mutex = NULL;
+extern int *active_buffer;
+extern int *inactive_buffer;
 
 void set_ebprof(int bitmap);
 int *active_buffer(void);
@@ -31,10 +33,6 @@ int ebp_collect(message * m_user, struct proc *caller);
 void
 set_ebprof(int bitmap)
 {
-	if (buffer_mutex != NULL)
-		mutex_destroy(buffer_mutex);	
-	mutex_init(buffer_mutex, MUTEX_DEFAULT, IPL_NONE);
-
 	ebp_bm = bitmap;
 	return;
 }
@@ -43,11 +41,18 @@ set_ebprof(int bitmap)
 int*
 active_buffer()
 {
-	int *active_buffer;
-	// Do timer stuff to determine which buffer is going to be written to
-	// Lock it
+	int *tmp;
 	
-	
+	/* swap if full active buffer or consumer is starving */
+	if (reached == BUFFER_SIZE || time)
+	{
+		tmp = active_buffer;
+		active_buffer = inactive_buffer;
+		inactive_buffer = tmp;
+		reached = 0;
+		switch_buffer++;
+	}
+	else reached++;	
 	return active_buffer;
 }
 
@@ -64,7 +69,11 @@ ebp_collect (message * m_user, struct proc *caller)
 {
   int *current_buffer;
   struct kcall_sample *sample;
- 
+
+  if (buffer_mutex != NULL)
+	mutex_destroy(buffer_mutex);	
+  mutex_init(buffer_mutex, MUTEX_DEFAULT, IPL_NONE);
+	
   /* Collect profiling data */ 
   sample->time		=
   sample->kcall 	=
@@ -76,7 +85,6 @@ ebp_collect (message * m_user, struct proc *caller)
 
   current_buffer = active_buffer();
   current_buffer[reached] = sample;
-  reached++;
   // Release mutex
 
   return 0;
