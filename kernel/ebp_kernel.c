@@ -9,8 +9,7 @@
 extern int *first;
 extern int *second;
 extern int reached = 0; /* Where we are in the buffer */
-extern struct kmutex buffer_mutex = NULL;
-extern int *active_buffer;
+int *active_buffer;
 extern int *inactive_buffer;
 
 void set_ebprof(int bitmap);
@@ -21,9 +20,6 @@ int ebp_collect(message * m_user, struct proc *caller);
 // TODO:
 // BUFFER MANAGEMENT
 // Make first/second in kernel, set first second buffers when system is called
-// ebp.c fix binary
-// BINARY macro?
-// FIX EXTERN FIRST AND SECOND
 // READ DTRACE DOCS
 // Shared locks + shared buffer = happiness
 //     Need to get clock in kernel and userland
@@ -41,10 +37,9 @@ set_ebprof(int bitmap)
 int*
 active_buffer()
 {
-	//int *tmp;
-	
+	int *tmp;
 	/* swap if full active buffer or consumer is starving */
-	if (reached == BUFFER_SIZE) //|| time)
+	if (reached == BUFFER_SIZE) //|| time()))
 	{
 		tmp = active_buffer;
 		active_buffer = inactive_buffer;
@@ -69,18 +64,24 @@ ebp_collect (message * m_user, struct proc *caller)
 {
   int *current_buffer;
   struct kcall_sample *sample;
-  
-  /* Collect profiling data */ 
-  sample->time		=
-  sample->kcall 	=
-  sample->p_nr 		= 
-  sample->params 	=
-  sample->cpu 		=
-  sample->p_priority 	=
-  sample->p_priv 	=
+  int buf;
 
-  current_buffer = active_buffer();
-  current_buffer[reached] = sample;
+  // Acquire mutex
+  /* Collect profiling data */ 
+  int m_type = m_user->m_type;
+
+  //sample->time		=
+  sample->kcall 	= m_user->m_type;
+  sample->p_nr 		= caller->p_nr;
+  sample->p_endpoint	= caller->p_endpoint;
+  sample->params 	=
+  sample->cpu 		= caller->p_cpu;
+  sample->p_priority 	= caller->p_priority;
+  sample->p_priv 	= caller->p_priv;
+
+  // FIX THESE POINTERS, SEGFAULTS HURT!
+  current_buffer = active_buffer(); 
+  *current_buffer[reached] = *sample;
   // Release mutex
 
   return 0;
