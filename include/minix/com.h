@@ -593,6 +593,11 @@
 #define SVMCTL_MAP_PHYS_ADDR	m2_l1
 #define SVMCTL_MAP_PHYS_LEN	m2_l2
 
+/* Field names for SYS_EBPROF */
+#define EB_BUFFER1		m1_p1
+#define EB_BUFFER2		m1_p2
+#define EB_BITMAP		m1_i1
+
 #define VMMF_UNCACHED		(1L << 0)
 
 /* Values for SVMCTL_PARAM. */
