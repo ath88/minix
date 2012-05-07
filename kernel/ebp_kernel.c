@@ -10,14 +10,14 @@
 #define mutex_lock() (void)0
 #define mutex_unlock() (void)0
 
-EXTERN int *first;
-EXTERN int *second;
+EXTERN void *first;
+EXTERN void *second;
 EXTERN int reached = 0; /* Where we are in the buffer */
 EXTERN unsigned int switch_buffer;
-int *active_buffer;
+EXTERN void *active_buffer;
 
 void set_ebprof(int bitmap);
-int *active_buffer(void);
+void *get_active_buffer(void);
 int ebprofiling(void);
 int ebp_collect(message * m_user, struct proc *caller);
 int matches_bm(void);
@@ -37,7 +37,7 @@ set_ebprof(int bitmap)
 
 /* Returns pointer to active buffer */
 int*
-active_buffer()
+get_active_buffer()
 {
 	int *tmp;
 	mutex_lock();
@@ -73,7 +73,7 @@ ebp_collect (message * m_user, struct proc *caller)
   /* Collect profiling data */ 	
   int m_type = m_user->m_type;
 
-  current_buffer = active_buffer(); 
+  current_buffer = get_active_buffer(); 
   sample = *current_buffer[reached];
 
   //sample->time		=

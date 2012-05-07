@@ -200,7 +200,7 @@ _PROTOTYPE( int do_profbuf, (struct proc * caller, message *m_ptr) );
 #define do_profbuf NULL
 #endif
 
-_PROTOTYPE( int do_ebprofile(struct proc * caller, message *m_ptr) );
+_PROTOTYPE( int do_ebprofile, (struct proc * caller, message *m_ptr) );
 #if ! EBPROFILE
 #define do_ebprofile NULL
 #endif
