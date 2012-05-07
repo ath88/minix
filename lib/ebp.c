@@ -6,7 +6,7 @@
 
 #if EBPROFILE
 
-EXTERN int *inactive_buffer;
+EXTERN void *inactive_buffer;
 EXTERN unsigned int switch_buffer;
 
 int ebp_start (int bitmap);

@@ -1,5 +1,5 @@
-#ifndef EBPROF_H
-#define EBPROF_H
+#ifndef _EBPROF_H
+#define _EBPROF_H
 
 /* This header file defines types and structures
 *  for event-based profiling.
@@ -24,7 +24,7 @@
 
 #define BUFFER_SIZE	1024
 
-EXTERN int *inactive_buffer;
+EXTERN void *inactive_buffer;
 EXTERN unsigned int switch_buffer;
 
 struct
@@ -40,7 +40,7 @@ struct
   struct priv *p_priv;  
 } kcall_sample;
 
-struct typedef
+typedef struct 
 {
   void *first;
   void *second;
@@ -48,7 +48,7 @@ struct typedef
 
 /* kernel functions */
 void set_ebprof(int bitmap);
-int *active_buffer(void);
+void *get_active_buffer(void);
 void ebprofiling(void);
 int ebp_collect (message *m_user, struct proc *caller);
 int matches_bm(void);
@@ -60,4 +60,5 @@ int ebp_get (void *buffer);
 int *alloc_buffers (void);
 int buffer_switched (void);
 
-#endif /* EBPROF_H */
+#endif /* EBPROFILE */
+#endif /* _EBPROF_H */

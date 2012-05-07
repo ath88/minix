@@ -106,7 +106,7 @@
 /* Enable or disable system profiling. */
 #define SPROFILE          0    /* statistical profiling */
 #define CPROFILE          0    /* call profiling */
-#define EBPROFILE	  0    /* event-based profiling */
+#define EBPROFILE	  1    /* event-based profiling */
 
 /* PCI configuration parameters */
 #define NR_PCIBUS 40
