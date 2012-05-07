@@ -28,7 +28,7 @@
 EXTERN void *inactive_buffer;
 EXTERN unsigned int switch_buffer;
 
-struct
+typedef struct
 {
   int time;
   int kcall;
@@ -50,7 +50,7 @@ typedef struct
 /* kernel functions */
 void set_ebprof(int bitmap);
 void *get_active_buffer(void);
-void ebprofiling(void);
+int ebprofiling(void);
 int ebp_collect (message *m_user, struct proc *caller);
 int matches_bm(int m_type);
 
