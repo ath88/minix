@@ -160,7 +160,7 @@ PUBLIC void kernel_call(message *m_user, struct proc * caller)
   }
 
   #ifdef EBPROFILE
-  if (ebprofiling() == 1 && matches_bm())
+  if (ebprofiling() == 1 && matches_bm(m_user->type))
   	ebp_collect(m_user, caller);
   #endif /* EBPROFILE */
   
