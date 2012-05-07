@@ -88,7 +88,6 @@ EXTERN unsigned bkl_tries[CONFIG_MAX_CPUS];
 EXTERN unsigned bkl_succ[CONFIG_MAX_CPUS];
 
 /* Event-based profiling */
-
 EXTERN int ebp_bm; /* bitmap */
 EXTERN int *first;
 EXTERN int *second;

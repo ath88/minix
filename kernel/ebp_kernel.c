@@ -30,6 +30,7 @@ int matches_bm(void);
 
 void
 set_ebprof(int bitmap)
+
 {
 	ebp_bm = bitmap;
 	return;
@@ -68,7 +69,7 @@ int
 ebp_collect (message * m_user, struct proc *caller)
 {
   int *current_buffer;
-  struct kcall_sample *sample;
+  kcall_sample *sample;
 
   /* Collect profiling data */ 	
   int m_type = m_user->m_type;
@@ -107,21 +108,11 @@ int matches_bm(int m_type)
 		return ebp_bm & EBP_SYSCTL;
 	if (36 <= m_type <= 38)
 		return ebp_bm & EBP_PROF;
-	if (47 <= m_type 49)
+	if (47 <= m_type <= 49)
 		return ebp_bm & EBP_SHAD;
 	if (50 <= m_type <= 55)
 		return ebp_bm & EBP_MISC;
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
 
 #endif /* EBPROFILE */

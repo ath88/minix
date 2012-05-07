@@ -28,7 +28,7 @@
 EXTERN void *inactive_buffer;
 EXTERN unsigned int switch_buffer;
 
-struct
+typedef struct
 {
   int time;
   int kcall;
