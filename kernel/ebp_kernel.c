@@ -2,11 +2,11 @@
 */
 
 #include "ebp.h"
-#include "sys/sys/mutex.h"
 #include "glo.h"
 
 #if EBPROFILE
 
+/* Until mutexes are implemented */
 #define mutex_lock() (void)0
 #define mutex_unlock() (void)0
 
@@ -88,9 +88,40 @@ ebp_collect (message * m_user, struct proc *caller)
   return 0;
 }
 
-int matches_bm()
+/* A not so pretty filtering function */
+int matches_bm(int m_type)
 {
+	if (0 <= m_type <= 6 || m_type == 34 || m_type == 46)
+		return ebp_bm & EBP_PM;
+	if (7 <= m_type <= 10)
+		return ebp_bm & EBP_SIGH;
+	if (11 <= m_type <=13 || m_type == 43)
+		return ebp_bm & EBP_MEM;	
+	if (14 <= m_type <=17 || 31 <= m_type <= 33)
+		return ebp_bm & EBP_COPY;
+	if (19 <= m_type <=23 ||m_type== 28 ||m_type == 35)
+		return ebp_bm & EBP_DEVIO;
+	if (24 <= m_type <= 25 || m_type == 39 || m_type == 45)
+		return ebp_bm & EBP_CLOCK;
+	if (26 <= m_type <= 27 ||m_type == 44)
+		return ebp_bm & EBP_SYSCTL;
+	if (36 <= m_type <= 38)
+		return ebp_bm & EBP_PROF;
+	if (47 <= m_type 49)
+		return ebp_bm & EBP_SHAD;
+	if (50 <= m_type <= 55)
+		return ebp_bm & EBP_MISC;
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
 
 #endif /* EBPROFILE */
