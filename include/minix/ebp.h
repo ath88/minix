@@ -16,11 +16,12 @@
 #define EBP_SIGH   FLAG_AT(2)
 #define EBP_MEM    FLAG_AT(3)
 #define EBP_COPY   FLAG_AT(4)
-#define EBP_SHAD   FLAG_AT(5)
-#define EBP_DEVIO  FLAG_AT(6)
+#define EBP_DEVIO   FLAG_AT(5)
+#define EBP_CLOCK  FLAG_AT(6)
 #define EBP_SYSCTL FLAG_AT(7)
-#define EBP_CLOCK  FLAG_AT(8)
-#define EBP_PROF   FLAG_AT(9)
+#define EBP_PROF  FLAG_AT(8)
+#define EBP_SHAD   FLAG_AT(9)
+#define EBP_MISC   FLAG_AT(10)
 
 #define BUFFER_SIZE	1024
 
@@ -51,7 +52,7 @@ void set_ebprof(int bitmap);
 int *active_buffer(void);
 void ebprofiling(void);
 int ebp_collect (message *m_user, struct proc *caller);
-int matches_bm(void);
+int matches_bm(int m_type);
 
 /* userland functions */
 int ebp_start (int bitmap);
