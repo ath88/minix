@@ -7,6 +7,9 @@
 
 #if EBPROFILE
 
+#define mutex_lock() (void)0
+#define mutex_unlock() (void)0
+
 EXTERN int *first;
 EXTERN int *second;
 EXTERN int reached = 0; /* Where we are in the buffer */
@@ -21,11 +24,8 @@ int matches_bm(void);
 
 // TODO:
 // BUFFER MANAGEMENT
-// Make first/second in kernel, set first second buffers when system is called
-// READ DTRACE DOCS
 // Shared locks + shared buffer = happiness
 //     Need to get clock in kernel and userland
-// LOOK AT ALL COMMENTS
 // Disable interrupts
 
 void
@@ -39,8 +39,9 @@ set_ebprof(int bitmap)
 int*
 active_buffer()
 {
-	//MUTEX
 	int *tmp;
+	mutex_lock();
+
 	/* swap if full active buffer or consumer is starving */
 	if (reached == BUFFER_SIZE) //|| time()))
 	{
@@ -51,7 +52,7 @@ active_buffer()
 		switch_buffer++;
 	}
 	else reached++;	
-	//MUTEX ULOCK
+	mutex_unlock();
 	return active_buffer;
 }
 
@@ -69,8 +70,8 @@ ebp_collect (message * m_user, struct proc *caller)
   int *current_buffer;
   struct kcall_sample *sample;
 
-  /* Collect profiling data */ 
-  int m_type = m_user->m_type; // ???
+  /* Collect profiling data */ 	
+  int m_type = m_user->m_type;
 
   current_buffer = active_buffer(); 
   sample = *current_buffer[reached];
@@ -83,6 +84,7 @@ ebp_collect (message * m_user, struct proc *caller)
   sample->cpu 		= caller->p_cpu;
   sample->p_priority 	= caller->p_priority;
   //sample->p_priv 	= caller->p_priv;
+
   return 0;
 }
 

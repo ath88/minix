@@ -60,11 +60,9 @@ int*
 alloc_buffers (void)
 {
   buffer = malloc (sizeof (kcall_sample[BUFFER_SIZE]));
-  if (buffer == 0)
+  if (buffer == NULL)
     {
-      printf
-	("Could not allocate buffers. Disabling event-based profiling.\n")
-	return 1;
+      printf("Could not allocate buffers. Disabling event-based profiling.\n")
     }
   else
     {
