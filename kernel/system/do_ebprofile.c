@@ -9,7 +9,7 @@
 
 #include "kernel/system.h"
 #include <unistd.h>
-#include "ebp.h"
+#include <ebp.h>
 
 #if EBPROFILE
 
