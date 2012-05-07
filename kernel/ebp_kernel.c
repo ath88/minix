@@ -10,13 +10,14 @@
 EXTERN int *first;
 EXTERN int *second;
 EXTERN int reached = 0; /* Where we are in the buffer */
+EXTERN unsigned int switch_buffer;
 int *active_buffer;
-EXTERN int *inactive_buffer;
 
 void set_ebprof(int bitmap);
 int *active_buffer(void);
 int ebprofiling(void);
 int ebp_collect(message * m_user, struct proc *caller);
+int matches_bm(void);
 
 // TODO:
 // BUFFER MANAGEMENT
@@ -38,6 +39,7 @@ set_ebprof(int bitmap)
 int*
 active_buffer()
 {
+	//MUTEX
 	int *tmp;
 	/* swap if full active buffer or consumer is starving */
 	if (reached == BUFFER_SIZE) //|| time()))
@@ -49,6 +51,7 @@ active_buffer()
 		switch_buffer++;
 	}
 	else reached++;	
+	//MUTEX ULOCK
 	return active_buffer;
 }
 
@@ -56,7 +59,7 @@ active_buffer()
 int
 ebprofiling()
 {
-	return ebp_bm & 1; // first bit
+	return ebp_bm & 0x1; // first bit
 }
 
 /* Write profiling information to buffer */
@@ -66,25 +69,26 @@ ebp_collect (message * m_user, struct proc *caller)
   int *current_buffer;
   struct kcall_sample *sample;
 
-  // Acquire mutex
   /* Collect profiling data */ 
-  int m_type = m_user->m_type;
+  int m_type = m_user->m_type; // ???
+
+  current_buffer = active_buffer(); 
+  sample = *current_buffer[reached];
 
   //sample->time		=
   sample->kcall 	= m_user->m_type; // This might be incorrect
   sample->p_nr 		= caller->p_nr;
   sample->p_endpoint	= caller->p_endpoint;
-  sample->params 	=
+  //sample->params 	=
   sample->cpu 		= caller->p_cpu;
   sample->p_priority 	= caller->p_priority;
-  sample->p_priv 	= caller->p_priv;
-
-  // FIX THESE POINTERS, SEGFAULTS HURT!
-  current_buffer = active_buffer(); 
-  *current_buffer[reached] = *sample;
-  // Release mutex
-
+  //sample->p_priv 	= caller->p_priv;
   return 0;
+}
+
+int matches_bm()
+{
+	return 0;
 }
 
 #endif /* EBPROFILE */

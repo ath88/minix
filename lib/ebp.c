@@ -43,12 +43,16 @@ ebp_stop (void)
 /* Write current profiling information to buffer. */
 int
 ebp_get (void *buffer)
-{  
-  // Try to get lock, if it gets
-  
-  buffer = inactive_buffer;
-  //Lock stuff
-  return 0;
+{ 
+  int switch_ret;
+  if (switch_buffer)
+  {
+	buffer = inactive_buffer;
+	switch_ret = switch_buffer;
+	switch_buffer = 0;
+	return switch_ret;
+  }
+  return switch_buffer;
 }
 
 /* Allocates memory for double buffering */
@@ -56,7 +60,6 @@ int*
 alloc_buffers (void)
 {
   buffer = malloc (sizeof (kcall_sample[BUFFER_SIZE]));
-
   if (buffer == 0)
     {
       printf
@@ -68,6 +71,11 @@ alloc_buffers (void)
       memset (buffer, '\0', sizeof (kcall_sample[BUFFER_SIZE]));
     }
   return buffer;
+}
+
+int buffer_switched (void)
+{
+	return switch_buffer;
 }
 
 #endif /* EBPROFILE */

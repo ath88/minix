@@ -51,11 +51,13 @@ void set_ebprof(int bitmap);
 int *active_buffer(void);
 void ebprofiling(void);
 int ebp_collect (message *m_user, struct proc *caller);
+int matches_bm(void);
 
 /* userland functions */
 int ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
 int *alloc_buffers (void);
+int buffer_switched (void);
 
 #endif /* EBPROF_H */
