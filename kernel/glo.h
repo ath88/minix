@@ -89,8 +89,8 @@ EXTERN unsigned bkl_succ[CONFIG_MAX_CPUS];
 
 /* Event-based profiling */
 EXTERN int ebp_bm; /* bitmap */
-EXTERN int *first;
-EXTERN int *second;
+EXTERN void *first;
+EXTERN void *second;
 EXTERN int reached; /* Where we are in the buffer */
 
 #endif /* GLO_H */

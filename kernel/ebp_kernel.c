@@ -1,7 +1,7 @@
 /* Kernel functions for event-based profiling
 */
 
-#include "ebp.h"
+#include <minix/ebp.h>
 #include "glo.h"
 
 #if EBPROFILE
@@ -12,7 +12,7 @@
 
 EXTERN void *first;
 EXTERN void *second;
-EXTERN int reached = 0; /* Where we are in the buffer */
+EXTERN int reached; /* Where we are in the buffer */
 EXTERN unsigned int switch_buffer;
 EXTERN void *active_buffer;
 
@@ -20,7 +20,7 @@ void set_ebprof(int bitmap);
 void *get_active_buffer(void);
 int ebprofiling(void);
 int ebp_collect(message * m_user, struct proc *caller);
-int matches_bm(void);
+int matches_bm(int m_type);
 
 // TODO:
 // BUFFER MANAGEMENT
@@ -32,12 +32,13 @@ void
 set_ebprof(int bitmap)
 
 {
+	reached = 0;
 	ebp_bm = bitmap;
 	return;
 }
 
 /* Returns pointer to active buffer */
-int*
+void *
 get_active_buffer()
 {
 	int *tmp;
@@ -77,14 +78,14 @@ ebp_collect (message * m_user, struct proc *caller)
   current_buffer = get_active_buffer(); 
   sample = *current_buffer[reached];
 
-  //sample->time		=
-  sample->kcall 	= m_user->m_type; // This might be incorrect
-  sample->p_nr 		= caller->p_nr;
-  sample->p_endpoint	= caller->p_endpoint;
-  //sample->params 	=
-  sample->cpu 		= caller->p_cpu;
-  sample->p_priority 	= caller->p_priority;
-  //sample->p_priv 	= caller->p_priv;
+  //sample.time		=
+  sample.kcall 		= m_user->m_type; // This might be incorrect
+  sample.p_nr 		= caller->p_nr;
+  sample.p_endpoint	= caller->p_endpoint;
+  //sample.params 	=
+  sample.cpu 		= caller->p_cpu;
+  sample.p_priority 	= caller->p_priority;
+  //sample.p_priv 	= caller->p_priv;
 
   return 0;
 }
@@ -104,7 +105,7 @@ int matches_bm(int m_type)
 		return ebp_bm & EBP_DEVIO;
 	if (24 <= m_type <= 25 || m_type == 39 || m_type == 45)
 		return ebp_bm & EBP_CLOCK;
-	if (26 <= m_type <= 27 ||m_type == 44)
+	if (26 <= m_type <= 27 || m_type == 44)
 		return ebp_bm & EBP_SYSCTL;
 	if (36 <= m_type <= 38)
 		return ebp_bm & EBP_PROF;

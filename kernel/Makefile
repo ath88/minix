@@ -85,7 +85,7 @@ CPPFLAGS+= -DUSE_BOOTPARAM
 .endif
 
 # These come last, so the profiling buffer is at the end of the data segment
-SRCS+= profile.c do_sprofile.c
+SRCS+= profile.c do_sprofile.c ebp_kernel.c
 
 .include <bsd.prog.mk>
 
