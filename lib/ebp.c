@@ -6,12 +6,13 @@
 
 #if EBPROFILE
 
-extern unsigned int switch_buffer;
+EXTERN int *inactive_buffer;
+EXTERN unsigned int switch_buffer;
+
 int ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
 int *alloc_buffers (void);
-int *inactive_buffer;
 
 /* Initializes datastructures used for profiling. */
 int

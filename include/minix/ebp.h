@@ -12,7 +12,6 @@
 #if EBPROFILE
 
 #define FLAG_AT(x) 0x1 << (x-1)
-
 #define EBP_PM     FLAG_AT(1)
 #define EBP_SIGH   FLAG_AT(2)
 #define EBP_MEM    FLAG_AT(3)
@@ -25,7 +24,8 @@
 
 #define BUFFER_SIZE	1024
 
-EXTERN int ebp_bm; /* bitmap for profiling flags */
+EXTERN int *inactive_buffer;
+EXTERN unsigned int switch_buffer;
 
 struct
 {

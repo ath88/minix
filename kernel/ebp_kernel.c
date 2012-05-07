@@ -3,14 +3,15 @@
 
 #include "ebp.h"
 #include "sys/sys/mutex.h"
+#include "glo.h"
 
 #if EBPROFILE
 
-extern int *first;
-extern int *second;
-extern int reached = 0; /* Where we are in the buffer */
+EXTERN int *first;
+EXTERN int *second;
+EXTERN int reached = 0; /* Where we are in the buffer */
 int *active_buffer;
-extern int *inactive_buffer;
+EXTERN int *inactive_buffer;
 
 void set_ebprof(int bitmap);
 int *active_buffer(void);
@@ -64,14 +65,13 @@ ebp_collect (message * m_user, struct proc *caller)
 {
   int *current_buffer;
   struct kcall_sample *sample;
-  int buf;
 
   // Acquire mutex
   /* Collect profiling data */ 
   int m_type = m_user->m_type;
 
   //sample->time		=
-  sample->kcall 	= m_user->m_type;
+  sample->kcall 	= m_user->m_type; // This might be incorrect
   sample->p_nr 		= caller->p_nr;
   sample->p_endpoint	= caller->p_endpoint;
   sample->params 	=
