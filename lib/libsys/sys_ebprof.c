@@ -3,7 +3,7 @@
 /*===========================================================================*
  *                                sys_ebprof				     *
  *===========================================================================*/
-int sys_ebprof(buffer1, buffer2, ebp_pm)
+PUBLIC int sys_ebprof(buffer1, buffer2, ebp_pm)
 void *buffer1;
 void *buffer2;
 int ebp_pm;
