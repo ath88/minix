@@ -9,7 +9,7 @@ void *buffer2;
 int ebp_pm;
 {
         message m;
-	
+
 	m.BUFFER1 	= buffer1;
 	m.BUFFER2 	= buffer2;
 	m.BITMAP	= ebp_pm;

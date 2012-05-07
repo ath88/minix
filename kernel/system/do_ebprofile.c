@@ -31,14 +31,19 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
     set_ebprof(0x0);
     first = NULL;
     second = NULL;
+    active_buffer = NULL;
+    inactive_buffer = NULL;
 
     return(OK);
   }
 
   /* if not, enable and set buffer & flags appropriately */
-  set_ebprof(bitmap);
+  active_buffer = buffer1;
+  inactive_buffer = buffer2;
   first  = buffer1;
   second = buffer2; 
+
+  set_ebprof(bitmap);
 
   return(OK);
 }

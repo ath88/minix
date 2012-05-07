@@ -6,17 +6,18 @@
 
 #if EBPROFILE
 
+extern unsigned int switch_buffer;
 int ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
 int *alloc_buffers (void);
+int *inactive_buffer;
 
 /* Initializes datastructures used for profiling. */
 int
 ebp_start (int bitmap)
 {
   epb_buffers *buffers;
-  
   buffers->first  = alloc_buffers();
   buffers->second = alloc_buffers();
 
@@ -43,6 +44,9 @@ int
 ebp_get (void *buffer)
 {  
   // Try to get lock, if it gets
+  
+  buffer = inactive_buffer;
+  //Lock stuff
   return 0;
 }
 
@@ -64,4 +68,5 @@ alloc_buffers (void)
     }
   return buffer;
 }
+
 #endif /* EBPROFILE */
