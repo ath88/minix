@@ -14,7 +14,8 @@ EXTERN void *first;
 EXTERN void *second;
 EXTERN int reached; /* Where we are in the buffer */
 EXTERN unsigned int switch_buffer;
-EXTERN void *active_buffer;
+ void *active_buffer;
+EXTERN void *inactive_buffer;
 
 void set_ebprof(int bitmap);
 void *get_active_buffer(void);
@@ -81,10 +82,10 @@ ebp_collect (message * m_user, struct proc *caller)
   //sample.time		=
   sample.kcall 		= m_user->m_type; // This might be incorrect
   sample.p_nr 		= caller->p_nr;
-  sample.p_endpoint	= caller->p_endpoint;
+  //sample.p_endpoint	= caller->p_endpoint;
   //sample.params 	=
-  sample.cpu 		= caller->p_cpu;
-  sample.p_priority 	= caller->p_priority;
+  //sample.cpu 		= caller->p_cpu;
+  //sample.p_priority 	= caller->p_priority;
   //sample.p_priv 	= caller->p_priv;
 
   return 0;
