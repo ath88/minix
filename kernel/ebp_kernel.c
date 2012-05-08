@@ -69,14 +69,14 @@ ebprofiling()
 int
 ebp_collect (message * m_user, struct proc *caller)
 {
-  int *current_buffer;
+  void *current_buffer;
   kcall_sample *sample;
 
   /* Collect profiling data */ 	
   int m_type = m_user->m_type;
 
   current_buffer = get_active_buffer(); 
-  sample = *current_buffer[reached];
+  sample = *(kcall_sample*) current_buffer[reached];
 
   //sample.time		=
   sample.kcall 		= m_user->m_type; // This might be incorrect
