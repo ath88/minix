@@ -2,23 +2,27 @@
 *  event-based profiling in MINIX 3. 
 */
 
-#include "ebp.h"
+#include <minix/ebp.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <minix/syslib.h>
 
 #if EBPROFILE
 
 EXTERN void *inactive_buffer;
 EXTERN unsigned int switch_buffer;
 
-int ebp_start (int bitmap);
+ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
-int *alloc_buffers (void);
+kcall_sample *alloc_buffers (void);
 
 /* Initializes datastructures used for profiling. */
-int
+ebp_buffers *
 ebp_start (int bitmap)
 {
-  epb_buffers *buffers;
+  ebp_buffers *buffers;
   buffers->first  = alloc_buffers();
   buffers->second = alloc_buffers();
 
@@ -56,14 +60,14 @@ ebp_get (void *buffer)
 }
 
 /* Allocates memory for double buffering */
-int*
+kcall_sample *
 alloc_buffers (void)
 {
   kcall_sample *buffer;
   buffer = malloc (sizeof (kcall_sample[BUFFER_SIZE]));
   if (buffer == NULL)
     {
-      printf("Could not allocate buffers. Disabling event-based profiling.\n")
+      printf("Could not allocate buffers. Disabling event-based profiling.\n");
     }
   else
     {

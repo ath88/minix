@@ -56,10 +56,10 @@ int ebp_collect (message *m_user, struct proc *caller);
 int matches_bm(int m_type);
 
 /* userland functions */
-int ebp_start (int bitmap);
+ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
-int *alloc_buffers (void);
+kcall_sample *alloc_buffers (void);
 int buffer_switched (void);
 
 #endif /* EBPROFILE */
