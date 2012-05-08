@@ -3,6 +3,7 @@
 
 #include <minix/ebp.h>
 #include "glo.h"
+#include "proc.h"
 
 #if EBPROFILE
 
