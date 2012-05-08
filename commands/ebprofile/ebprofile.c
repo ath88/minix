@@ -4,29 +4,18 @@
 
 // Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
 
-#include "ebprof.h"
+#include <minix/ebprofile.h>
 #include <sys/signal.h>
 #include <signal.h>
 
 #if EBPROFILE
 
-#define HELP  0
-#define START 1
-#define STOP  2
-
-// TODO fix buffer size
-int buf_size = 0;
 int outfile = 0;
-
-extern int *fir_buf;
-extern int *sec_buf;
 
 int start (void);
 int stop (void);
 int help (void);
-int collect (void);
 int handle_args (int argc, char *argv[]);
-int alloc_buffers (void);
 
 /* Starts event-based profiling. */
 int
@@ -34,8 +23,8 @@ main (int argc, char *argv[])
 {
   int action;
 
+  /* bsd conformance */
   setprogname (argv[0]);
-
   action = handle_args (argc, argv);
   switch (action)
     {
@@ -57,16 +46,24 @@ main (int argc, char *argv[])
 int
 start ()
 {
-  fir_buf = alloc_buffers ();
-  sec_buf = alloc_buffers ();
+  ebp_buffers *buffers;
+  kcall_sample *consumer_buffer = (kcall_sample *) malloc(sizeof(kcall_sample[BUFFER_SIZE]));
 
-  /* Start profiling in kernel */
-  do_ebprofile(fir_buf, sec_buf);  
+  /* Allocates buffers and start profiling */
+  buffers = ebp_start(0xFFF); // test bitmap
 
-  // Loop consumer, read buffers and write to file or socket (SUCK IT!) 
-  while (1)
+  /* Loop consumer, read buffers and write to file or socket */
+  int i, j;
+  j = 0;
+  while (j != 1000)
   {
-
+	j++;
+	if (!ebp_get(consumer_buffer))
+		continue;
+	for (i=0; i<= BUFFER_SIZE; i++)
+	{
+		printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
+	}
   }
   return 0;
 }
@@ -74,11 +71,9 @@ start ()
 /* Stops event-based profiling in MINIX. */
 // TODO pkill process, if exists. probably needs to report back to user what happened
 int
-stop ()
-{
-
-  sigaction(SIGKILL); // Read docs, noobz
-  
+stop () {
+  ebp_stop();
+  //sigaction(SIGKILL); // Read docs, noobz
   return 0;
 }
 
