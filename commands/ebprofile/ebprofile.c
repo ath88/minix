@@ -5,6 +5,10 @@
 // Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
 
 #include <minix/ebprofile.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #if EBPROFILE
 
@@ -12,7 +16,7 @@ int outfile = 0;
 
 int start (void);
 int stop (void);
-int help (void);
+void help (void);
 int handle_args (int argc, char *argv[]);
 
 /* Starts event-based profiling. */
@@ -32,8 +36,6 @@ main (int argc, char *argv[])
       start ();
     case STOP:
       stop ();
-    case GET:
-      get ();
     default:
       printf ("Incorrect arguments.\n");
       help ();
@@ -79,7 +81,7 @@ stop () {
 void
 help ()
 {
-  printf ("Event-based profiling:\n")
+  printf ("Event-based profiling:\n");
   printf ("  ebprofile start [-f filename | -n ip:port] [-d]\n");
   printf ("  ebprofile stop\n");
   printf ("Use ebprofalyze.pl to analyze output file.\n");
@@ -106,9 +108,9 @@ handle_args (int argc, char *argv[])
 	{
 	  return STOP;
 	}
-}
-      return HELP;
     }
+    return HELP;
 }
+
 
 #endif

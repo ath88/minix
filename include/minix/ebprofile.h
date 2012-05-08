@@ -13,7 +13,7 @@
 #define START 1
 #define STOP  2
 
-#define BUFFER_SIZE
+#define BUFFER_SIZE 1024
 
 #endif /* EBPROFILE */
 #endif /* EBPROF_H */
