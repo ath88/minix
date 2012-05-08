@@ -13,8 +13,9 @@
 EXTERN void *first;
 EXTERN void *second;
 EXTERN int reached; /* Where we are in the buffer */
-EXTERN unsigned int switch_buffer;
-EXTERN void *active_buffer;
+unsigned int switch_buffer;
+void *active_buffer;
+void *inactive_buffer;
 
 void set_ebprof(int bitmap);
 void *get_active_buffer(void);
@@ -70,13 +71,13 @@ int
 ebp_collect (message * m_user, struct proc *caller)
 {
   void *current_buffer;
-  kcall_sample *sample;
+  kcall_sample sample;
 
   /* Collect profiling data */ 	
   int m_type = m_user->m_type;
 
   current_buffer = get_active_buffer(); 
-  sample = *(kcall_sample*) current_buffer[reached];
+  sample = ((kcall_sample*) current_buffer)[reached];
 
   //sample.time		=
   sample.kcall 		= m_user->m_type; // This might be incorrect
