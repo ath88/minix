@@ -5,6 +5,7 @@
 *  for event-based profiling.
 */
 
+#include <minix/ipc.h>
 #include <minix/com.h>
 #include <minix/priv.h>
 #include <minix/const.h>
