@@ -15,4 +15,5 @@
 
 #define BUFFER_SIZE
 
+#endif /* EBPROFILE */
 #endif /* EBPROF_H */
