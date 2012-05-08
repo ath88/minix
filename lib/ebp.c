@@ -59,6 +59,7 @@ ebp_get (void *buffer)
 int*
 alloc_buffers (void)
 {
+  kcall_sample *buffer;
   buffer = malloc (sizeof (kcall_sample[BUFFER_SIZE]));
   if (buffer == NULL)
     {
