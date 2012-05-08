@@ -5,8 +5,6 @@
 // Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
 
 #include <minix/ebprofile.h>
-#include <sys/signal.h>
-#include <signal.h>
 
 #if EBPROFILE
 
