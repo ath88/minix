@@ -5,9 +5,8 @@
 *  for event-based profiling.
 */
 
-#include "com.h"
-#include "priv.h"
-#include "kernel.h"
+#include <minix/com.h>
+#include <minix/priv.h>
 
 #if EBPROFILE
 
