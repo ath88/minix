@@ -33,7 +33,7 @@ typedef struct
 {
   int time;
   int kcall;
-  proc_nr_t p_nr;
+  unsigned int p_nr;
   endpoint_t p_endpoint;
   int *params[12];
   /* from kernel/proc.c */
