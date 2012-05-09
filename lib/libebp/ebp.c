@@ -27,13 +27,13 @@ ebp_start (int bitmap)
 {
   buffers->first  = alloc_buffers();
   buffers->second = alloc_buffers();
-  switch_buffer = malloc(int);
+  switch_buffer = malloc(sizeof(int));
 
   /* Set profiling flag */
   bitmap &= 0x1;
  
   /* do syscall */ 
-  sys_ebprof(buffers->first, buffers->second, bitmap, switch_buffer); //MAYBE LOCKS?
+  sys_ebprof(buffers->first, buffers->second, bitmap); //, switch_buffer); //MAYBE LOCKS?
 
   return buffers;
 }
@@ -42,7 +42,7 @@ ebp_start (int bitmap)
 void
 ebp_stop (void)
 {
-  sys_ebprof(NULL, NULL, 0x0, NULL);
+  sys_ebprof(NULL, NULL, 0x0); //, NULL);
   return;
 }
 
@@ -63,7 +63,7 @@ ebp_get (void *buffer)
 	*switch_buffer = 0;
 	return switch_ret;
   }
-  return switch_buffer;
+  return *switch_buffer;
 }
 
 /* Allocates memory for double buffering */
