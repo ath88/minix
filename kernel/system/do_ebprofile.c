@@ -28,7 +28,10 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
   if (m_ptr->EB_BUFFER1 == NULL &&
       m_ptr->EB_BUFFER1 == NULL && m_ptr->EB_BITMAP == 0)
   {
+    /* null flags and free memory */
     set_ebprof(0x0);
+    free(first);
+    free(second);
     first = NULL;
     second = NULL;
     inactive_buffer = NULL;

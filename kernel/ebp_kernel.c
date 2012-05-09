@@ -32,7 +32,6 @@ int matches_bm(int m_type);
 
 void
 set_ebprof(int bitmap)
-
 {
 	reached = 0;
 	ebp_bm = bitmap;
