@@ -15,10 +15,10 @@
 int outfile = 0;
 
 
-int start, (void);
-int stop, (void);
-void help, (void)
-int handle_args, (int argc, char *argv[]);
+int start (void);
+int stop (void);
+void help (void)
+int handle_args (int argc, char *argv[]);
 
 
 /* Starts event-based profiling. */
