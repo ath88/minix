@@ -17,7 +17,7 @@ int outfile = 0;
 
 int start (void);
 int stop (void);
-void help (void)
+void help (void);
 int handle_args (int argc, char *argv[]);
 
 
