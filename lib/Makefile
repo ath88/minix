@@ -1,7 +1,7 @@
 .include <bsd.own.mk>
 
-SUBDIR= csu libebp libcompat_minix libc libblockdriver libchardriver     \
-	libnetdriver libedit libm libsys libtimers libutil \
+SUBDIR= csu libcompat_minix libc libblockdriver libchardriver     \
+	libnetdriver libedit libm libsys libebp libtimers libutil \
 	libl libhgfs libz libfetch libvtreefs libaudiodriver libmthread   \
 	libexec libdevman libusb libminlib libasyn          \
 	libddekit libminixfs libbdev libelf libminc libcrypt libterminfo \
