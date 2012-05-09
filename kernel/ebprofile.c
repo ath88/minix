@@ -18,11 +18,14 @@ unsigned int switch_buffer;
 void *active_buffer;
 void *inactive_buffer;
 
+/*
 void set_ebprof(int bitmap);
 void *get_active_buffer(void);
 int ebprofiling(void);
 int ebp_collect(message * m_user, struct proc *caller);
 int matches_bm(int m_type);
+*/
+
 
 // TODO:
 // BUFFER MANAGEMENT

@@ -1,5 +1,5 @@
-#ifndef _TOOL_EBPROF_H
-#define _TOOL_EBPROF_H
+#ifndef _LIB_EBPROF_H
+#define _LIB_EBPROF_H
 
 /* This header file defines types and structures
 *  for the ebprofile tool.
@@ -11,10 +11,6 @@
 #include <minix/const.h>
 
 #if EBPROFILE
-
-#define HELP  0
-#define START 1
-#define STOP  2
 
 #define BUFFER_SIZE 1024 // has to match with kernel/ebprofile.h
 
@@ -47,4 +43,4 @@ kcall_sample *alloc_buffers (void);
 int buffer_switched (void);
 
 #endif /* EBPROFILE */
-#endif /* _TOOL_EBPROF_H */
+#endif /* _LIB_EBPROF_H */

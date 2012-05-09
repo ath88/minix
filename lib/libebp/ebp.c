@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <minix/ebprofile.h>
+#include <minix/ebp.h>
 #include <minix/syslib.h>
 
 #if EBPROFILE

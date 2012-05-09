@@ -9,6 +9,7 @@
 #include <minix/com.h>
 #include <minix/priv.h>
 #include <minix/const.h>
+#include "glo.h"
 
 #if EBPROFILE
 
