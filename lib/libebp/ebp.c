@@ -54,13 +54,13 @@ ebp_get (void *buffer)
   // SHOULD WE USE SLEEPQUEUES?
 
   int switch_ret;
-  if (switch_buffer)
+  if (*switch_buffer)
   {
         // NEED TO USE MEMCOPY TO BUFFER FROM RELEVANT BUFFER
 //wrong?	buffer = inactive_buffer;
 // 	instead check on % of switch buffer, remember to use locks
-	switch_ret = switch_buffer;
-	switch_buffer = 0;
+	switch_ret = *switch_buffer;
+	*switch_buffer = 0;
 	return switch_ret;
   }
   return switch_buffer;
@@ -85,7 +85,7 @@ alloc_buffers (void)
 
 int buffer_switched (void)
 {
-	return switch_buffer;
+	return *switch_buffer;
 }
 
 #endif /* EBPROFILE */
