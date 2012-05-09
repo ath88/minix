@@ -7,7 +7,7 @@ PUBLIC int sys_ebprof(buffer1, buffer2, ebp_pm, switch_buffer)
 void *buffer1;
 void *buffer2;
 int ebp_pm;
-int switch_buffer;
+int *switch_buffer;
 {
         message m;
 
