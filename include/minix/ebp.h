@@ -1,8 +1,8 @@
-#ifndef _EBPROF_H
-#define _EBPROF_H
+#ifndef _LIB_EBPROF_H
+#define _LIB_EBPROF_H
 
 /* This header file defines types and structures
-*  for event-based profiling.
+*  for the ebprofile tool.
 */
 
 #include <minix/ipc.h>
@@ -12,23 +12,9 @@
 
 #if EBPROFILE
 
-#define FLAG_AT(x) 0x1 << (x-1)
-#define EBP_PM     FLAG_AT(1)
-#define EBP_SIGH   FLAG_AT(2)
-#define EBP_MEM    FLAG_AT(3)
-#define EBP_COPY   FLAG_AT(4)
-#define EBP_DEVIO   FLAG_AT(5)
-#define EBP_CLOCK  FLAG_AT(6)
-#define EBP_SYSCTL FLAG_AT(7)
-#define EBP_PROF  FLAG_AT(8)
-#define EBP_SHAD   FLAG_AT(9)
-#define EBP_MISC   FLAG_AT(10)
+#define BUFFER_SIZE 1024 // has to match with kernel/ebprofile.h
 
-#define BUFFER_SIZE	1024
-
-EXTERN void *inactive_buffer;
-EXTERN unsigned int switch_buffer;
-
+// COPY OF STRUCT FROM kernel/ebprofile.h !!!! 
 typedef struct
 {
   int time;
@@ -39,21 +25,15 @@ typedef struct
   /* from kernel/proc.c */
   unsigned cpu;
   char p_priority;
-  struct priv *p_priv;  
+  struct priv *p_priv;
 } kcall_sample;
 
-typedef struct 
+
+typedef struct
 {
   void *first;
   void *second;
 } ebp_buffers;
-
-/* kernel functions */
-void set_ebprof(int bitmap);
-void *get_active_buffer(void);
-int ebprofiling(void);
-int ebp_collect (message *m_user, struct proc *caller);
-int matches_bm(int m_type);
 
 /* userland functions */
 ebp_buffers *ebp_start (int bitmap);
@@ -63,4 +43,4 @@ kcall_sample *alloc_buffers (void);
 int buffer_switched (void);
 
 #endif /* EBPROFILE */
-#endif /* _EBPROF_H */
+#endif /* _LIB_EBPROF_H */

@@ -14,10 +14,12 @@
 
 int outfile = 0;
 
-_PROTOTYPE(int start, (void));
-_PROTOTYPE(int stop, (void));
-_PROTOTYPE(void help, (void));
-_PROTOTYPE(int handle_args, (int argc, char *argv[]));
+
+int start (void);
+int stop (void);
+void help (void);
+int handle_args (int argc, char *argv[]);
+
 
 /* Starts event-based profiling. */
 int

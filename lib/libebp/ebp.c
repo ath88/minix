@@ -2,30 +2,34 @@
 *  event-based profiling in MINIX 3. 
 */
 
-#include <minix/ebp.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <minix/ebp.h>
 #include <minix/syslib.h>
 
 #if EBPROFILE
 
-EXTERN void *inactive_buffer;
-EXTERN unsigned int switch_buffer;
-
+/*
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (void *buffer);
 kcall_sample *alloc_buffers (void);
+int buffers_switched (void);
+*/
+
+int *switch_buffer;
+int relevant_buffer;
+ebp_buffers *buffers;
 
 /* Initializes datastructures used for profiling. */
 ebp_buffers *
 ebp_start (int bitmap)
 {
-  ebp_buffers *buffers;
   message m;
   buffers->first  = alloc_buffers();
   buffers->second = alloc_buffers();
+  switch_buffer = malloc(sizeof(int));
 
   /* Set profiling flag */
   bitmap &= 0x1;
@@ -44,7 +48,14 @@ ebp_start (int bitmap)
 void
 ebp_stop (void)
 {
-  sys_ebprof(NULL, NULL, 0x0);
+  m.BUFFER1	= NULL;
+  m.BUFFER2	= NULL;
+  m.BITMAP	= 0x0;
+  free(switch_buffer);
+  free(buffers->first);
+  free(buffers->second);
+  switch_buffer = NULL;
+  _syscall(PM_PROC_NR, EBPROF, &m);
   return;
 }
 
@@ -53,15 +64,27 @@ ebp_stop (void)
 int
 ebp_get (void *buffer)
 { 
-  int switch_ret;
-  if (switch_buffer)
+  // SHOULD WE USE SLEEPQUEUES?
+
+  if (*switch_buffer)
   {
-	buffer = inactive_buffer;
-	switch_ret = switch_buffer;
-	switch_buffer = 0;
+	int switch_ret = *switch_buffer;
+	if (*switch_buffer % 2 == 1)
+	{	
+		relevant_buffer ? relevant_buffer = 0 : relevant_buffer = 1;
+	}
+	if (relevant_buffer == 1)
+	{
+		memcopy(buffer, buffers->second, sizeof(kcall_sample[BUFFER_SIZE]);
+	}
+	else
+	{
+		memcopy(buffer, buffers->first, sizeof(kcall_sample[BUFFER_SIZE]);
+	}
+	*switch_buffer = 0;
 	return switch_ret;
   }
-  return switch_buffer;
+  return *switch_buffer;
 }
 
 /* Allocates memory for double buffering */
@@ -83,7 +106,7 @@ alloc_buffers (void)
 
 int buffer_switched (void)
 {
-	return switch_buffer;
+	return *switch_buffer;
 }
 
 #endif /* EBPROFILE */

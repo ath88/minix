@@ -1,7 +1,7 @@
 /* Kernel functions for event-based profiling
 */
 
-#include <minix/ebp.h>
+#include "kernel/ebprofile.h"
 #include "glo.h"
 #include "proc.h"
 
@@ -13,16 +13,19 @@
 
 EXTERN void *first;
 EXTERN void *second;
-EXTERN int reached; /* Where we are in the buffer */
-unsigned int switch_buffer;
+unsigned int reached; /* Where we are in the buffer */
+unsigned int *switch_buffer;
 void *active_buffer;
 void *inactive_buffer;
 
+/*
 void set_ebprof(int bitmap);
 void *get_active_buffer(void);
 int ebprofiling(void);
 int ebp_collect(message * m_user, struct proc *caller);
 int matches_bm(int m_type);
+*/
+
 
 // TODO:
 // BUFFER MANAGEMENT
@@ -40,23 +43,19 @@ set_ebprof(int bitmap)
 
 /* Returns pointer to active buffer */
 void *
-get_active_buffer()
+get_next_slot()
 {
 	int *tmp;
 	mutex_lock();
-
 	/* swap if full active buffer or consumer is starving */
 	if (reached == BUFFER_SIZE) //|| time()))
 	{
-		tmp = active_buffer;
-		active_buffer = inactive_buffer;
-		inactive_buffer = tmp;
 		reached = 0;
-		switch_buffer++;
+		*switch_buffer++;
 	}
 	else reached++;	
 	mutex_unlock();
-	return active_buffer;
+	return ;
 }
 
 /* Returns whether or not profiling is enabled */
