@@ -1,7 +1,7 @@
 /* Kernel functions for event-based profiling
 */
 
-#include <minix/ebp.h>
+#include "kernel/ebprofile.h"
 #include "glo.h"
 #include "proc.h"
 
