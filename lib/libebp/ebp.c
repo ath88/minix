@@ -23,6 +23,7 @@ ebp_buffers *
 ebp_start (int bitmap)
 {
   ebp_buffers *buffers;
+  message m;
   buffers->first  = alloc_buffers();
   buffers->second = alloc_buffers();
 
@@ -30,8 +31,12 @@ ebp_start (int bitmap)
   bitmap &= 0x1;
  
   /* do syscall */ 
-  sys_ebprof(buffers->first, buffers->second, bitmap);
+  //sys_ebprof(buffers->first, buffers->second, bitmap);
+  m.BUFFER1	= buffers->first;
+  m.BUFFER2	= buffers->second;
+  m.BITMAP	= bitmap;
 
+  _syscall(PM_PROC_NR, EBPROF, &m);
   return buffers;
 }
 
