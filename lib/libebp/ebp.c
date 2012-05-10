@@ -87,7 +87,7 @@ ebp_get (void *buffer)
 }
 
 /* Allocates memory for double buffering */
-kcall_sample *
+ebp_sample_buffer *
 alloc_buffers (void)
 {
   ebp_sample_buffer *buffer;
@@ -103,11 +103,6 @@ alloc_buffers (void)
      buffer->reached = 0;
     }
   return buffer;
-}
-
-int buffer_switched (void)
-{
-	return *switch_buffer;
 }
 
 #endif /* EBPROFILE */
