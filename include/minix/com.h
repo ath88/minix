@@ -597,6 +597,7 @@
 #define EB_BUFFER1		m1_p1
 #define EB_BUFFER2		m1_p2
 #define EB_BITMAP		m1_i1
+#define EB_SWITCH		m1_i2
 
 #define VMMF_UNCACHED		(1L << 0)
 

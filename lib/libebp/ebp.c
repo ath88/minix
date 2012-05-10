@@ -7,6 +7,7 @@
 #include <string.h>
 #include <minix/ebp.h>
 #include <minix/syslib.h>
+#include <minix/callnr.h>
 
 #if EBPROFILE
 
@@ -36,9 +37,9 @@ ebp_start (int bitmap)
  
   /* do syscall */ 
   //sys_ebprof(buffers->first, buffers->second, bitmap);
-  m.BUFFER1	= buffers->first;
-  m.BUFFER2	= buffers->second;
-  m.BITMAP	= bitmap;
+  m.EB_BUFFER1	= buffers->first;
+  m.EB_BUFFER2	= buffers->second;
+  m.EB_BITMAP	= bitmap;
 
   _syscall(PM_PROC_NR, EBPROF, &m);
   return buffers;
@@ -48,9 +49,10 @@ ebp_start (int bitmap)
 void
 ebp_stop (void)
 {
-  m.BUFFER1	= NULL;
-  m.BUFFER2	= NULL;
-  m.BITMAP	= 0x0;
+  message m;
+  m.EB_BUFFER1	= NULL;
+  m.EB_BUFFER2	= NULL;
+  m.EB_BITMAP	= 0x0;
   free(switch_buffer);
   free(buffers->first);
   free(buffers->second);
@@ -71,15 +73,15 @@ ebp_get (void *buffer)
 	int switch_ret = *switch_buffer;
 	if (*switch_buffer % 2 == 1)
 	{	
-		relevant_buffer ? relevant_buffer = 0 : relevant_buffer = 1;
+		relevant_buffer ? (relevant_buffer = 0) : (relevant_buffer = 1);
 	}
 	if (relevant_buffer == 1)
 	{
-		memcopy(buffer, buffers->second, sizeof(kcall_sample[BUFFER_SIZE]);
+		memcpy(buffer, buffers->second, sizeof(kcall_sample[BUFFER_SIZE]));
 	}
 	else
 	{
-		memcopy(buffer, buffers->first, sizeof(kcall_sample[BUFFER_SIZE]);
+		memcpy(buffer, buffers->first, sizeof(kcall_sample[BUFFER_SIZE]));
 	}
 	*switch_buffer = 0;
 	return switch_ret;
