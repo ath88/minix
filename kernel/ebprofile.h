@@ -47,6 +47,13 @@ typedef struct
   struct priv *p_priv;  
 } kcall_sample;
 
+typedef struct
+{
+  kcall_sample sample[BUFFER_SIZE];
+  unsigned int reached;
+  int lock;
+} ebp_sample_buffer;
+
 /* kernel functions */
 void set_ebprof(int bitmap);
 void *get_active_buffer(void);

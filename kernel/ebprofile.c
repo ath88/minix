@@ -19,16 +19,29 @@ int ebp_collect(message * m_user, struct proc *caller);
 int matches_bm(int m_type);
 */
 
-
-/* Returns pointer to active buffer */
-void *
-get_next_slot()
+void
+set_ebprof(int bitmap)
 {
-	int *tmp;
-	mutex_lock();
-	/* swap if full active buffer or consumer is starving */
-	mutex_unlock();
-	return NULL;
+	ebp_bm = bitmap;
+	return;
+}
+
+/* Returns pointer to the next free slot in the active buffer */
+void *
+get_next_slot(relevant_buffer)
+{
+        kcall_sample *free_sample;
+        if (relevant_buffer)
+        {
+                free_sample = first->sample[first->reached];
+                first->reached++;
+        }
+        else
+        {
+                free_sample = second->sample[second->reached];
+                second->reached++;
+        }
+        return free_sample;
 }
 
 /* Returns whether or not profiling is enabled */
@@ -42,13 +55,14 @@ ebprofiling()
 int
 ebp_collect (message * m_user, struct proc *caller)
 {
-  void *current_buffer;
   kcall_sample sample;
-
-  /* Collect profiling data */ 	
+  unsigned int relevant_buffer = m_user.EBP_RELBUF;
   int m_type = m_user->m_type;
 
+  mutex_lock();
+  sample = get_next_slot(relevant_buffer); 
 
+  /* Collect profiling data */ 	
   //sample.time		=
   sample.kcall 		= m_user->m_type; // This might be incorrect
   sample.p_nr 		= caller->p_nr;
@@ -57,7 +71,7 @@ ebp_collect (message * m_user, struct proc *caller)
   //sample.cpu 		= caller->p_cpu;
   //sample.p_priority 	= caller->p_priority;
   //sample.p_priv 	= caller->p_priv;
-
+  mutex_unlock();
   return 0;
 }
 

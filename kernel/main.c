@@ -47,7 +47,7 @@ PUBLIC void bsp_finish_booting(void)
   ebp_bm = 0;          /* allocate bitmap only if needed */
   first = NULL;
   second = NULL;
-  relevant = NULL;
+  relevant_buffer = NULL;
 #endif /* EBPROFILE */
 
   cprof_procs_no = 0;  /* init nr of hash table slots used */
