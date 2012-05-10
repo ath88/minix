@@ -12,8 +12,10 @@
 
 #if EBPROFILE
 
-int outfile = 0;
-
+int c;
+int daemonize;
+int fd;
+char *cval;
 
 int start (void);
 int stop (void);
@@ -29,6 +31,7 @@ main (int argc, char *argv[])
 
   /* bsd conformance */
   setprogname (argv[0]);
+
   action = handle_args (argc, argv);
   switch (action)
     {
@@ -52,11 +55,14 @@ start ()
   kcall_sample *consumer_buffer = (kcall_sample *) malloc(sizeof(kcall_sample[BUFFER_SIZE]));
 
   /* Allocates buffers and start profiling */
-  buffers = ebp_start(0xFFF); // test bitmap
+  buffers = ebp_start(0xFFF); // test bitmap, profiles everything
 
   /* Loop consumer, read buffers and write to file or socket */
   int i, j;
   j = 0;
+
+  /* NEW FILE OR SOCKET MAGIC */
+
   while (j != 1000)
   {
 	j++;
@@ -64,7 +70,8 @@ start ()
 		continue;
 	for (i=0; i<= BUFFER_SIZE; i++)
 	{
-		printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
+            /* Here we would write to a file or a socket or stdout */
+        	printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
 	}
   }
   return 0;
@@ -84,13 +91,58 @@ void
 help ()
 {
   printf ("Event-based profiling:\n");
-  printf ("  ebprofile start [-f filename | -n ip:port] [-d]\n");
-  printf ("  ebprofile stop\n");
+  printf ("  |  ebprofile start [-f filename | -n ip:port] [-d]\n");
+  printf ("  |  ebprofile stop \n");
+  printf ("  |  ebprofile [-h] \n");
   printf ("Use ebprofalyze.pl to analyze output file.\n");
   return;
 }
 
 /* Handle arguments for ebprofile. */
+int
+handle_args (int argc, char *argv[])
+{
+  int action;
+  daemonize = 0;
+  fd = STDOUT;
+
+  /* determine action */
+  if (strcmp (*argv[1], "start") == 0)
+  {
+       action = START;
+  }
+  else if (strcmp (*argv[1], "stop") == 0)
+  {     
+       action = STOP;
+  }
+  else
+       action = HELP;
+
+  /* parse options */
+  while ((c = getopt(++argc, argv, "f:n:d")) != -1)
+    {
+      switch(c)
+      {
+          case 'f':
+                cval = optarg;
+                fd = LFILE;
+                break;   
+          case 'n':
+                cval = optarg;
+                fd = NETW;
+                break;
+          case 'd':
+                daemonize = 1;
+                break;
+          default:
+                printf("Unknown option character.\n");
+                break; 
+      }
+    }
+   return action;
+}  
+
+/*
 int
 handle_args (int argc, char *argv[])
 {
@@ -103,16 +155,17 @@ handle_args (int argc, char *argv[])
 	  return HELP;
 	}
       else if (strcmp (*argv, "start") == 0)
-	{
+        {
 	  return START;
 	}
       else if (strcmp (*argv, "stop") == 0)
 	{
 	  return STOP;
 	}
+
     }
     return HELP;
-}
+}*/
 
 
 #endif

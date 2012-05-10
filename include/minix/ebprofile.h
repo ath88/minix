@@ -16,6 +16,10 @@
 #define START 1
 #define STOP  2
 
+#define STDOUT 0 
+#define LFILE  1
+#define NETW   2
+
 #define BUFFER_SIZE 1024 // has to match with kernel/ebprofile.h
 
 // COPY OF STRUCT FROM kernel/ebprofile.h !!!! 
