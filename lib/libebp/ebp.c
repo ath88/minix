@@ -90,7 +90,7 @@ ebp_get (void *buffer)
 kcall_sample *
 alloc_buffers (void)
 {
-  kcall_sample *buffer;
+  ebp_sample_buffer *buffer;
   buffer = malloc (sizeof (ebp_sample_buffer));
   if (buffer == NULL)
     {
@@ -98,7 +98,9 @@ alloc_buffers (void)
     }
   else
     {
-      memset (buffer, '\0', sizeof (ebp_sample_buffer));
+     memset (buffer, '\0', sizeof (ebp_sample_buffer));
+     buffer->lock = 0;
+     buffer->reached = 0;
     }
   return buffer;
 }

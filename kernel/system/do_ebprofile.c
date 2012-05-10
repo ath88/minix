@@ -23,17 +23,17 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
 */
   void *buffer1 = m_ptr->EBP_BUFFER1;
   void *buffer2 = m_ptr->EBP_BUFFER2;
-  int bitmap = m_ptr->EB_BITMAP;
+  int bitmap = m_ptr->EBP_BITMAP;
   unsigned int relevant_buffer = m_ptr->EBP_RELBUF;
  
   /* check if we are trying to disable profiling */ 
   if (m_ptr->EBP_BUFFER1 == NULL &&
-      m_ptr->EBP_BUFFER1 == NULL && m_ptr->EB_BITMAP == 0)
+      m_ptr->EBP_BUFFER1 == NULL && m_ptr->EBP_BITMAP == 0)
   {
 //    ebp_bm = 0x0;
     return(OK);
   }
-
+  
   /* if not, enable and set buffer & flags appropriately */
 
 //  first  = buffer1;

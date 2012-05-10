@@ -32,7 +32,7 @@
 EXTERN int ebp_bm; /* bitmap */
 EXTERN void *first;
 EXTERN void *second;
-EXTERN unsigned int *relevant; /* Where we are in the buffer */
+EXTERN unsigned int *relevant_buffer;
 
 typedef struct
 {
