@@ -13,6 +13,10 @@
 
 #if EBPROFILE
 
+extern void *first; 
+extern void *second; 
+extern int *switch_buffer;
+
 /*===========================================================================*
  *				do_ebprofile				     *
  *===========================================================================*/
@@ -34,7 +38,7 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
   }
 
   /* if not, enable and set buffer & flags appropriately */
-  ebp_switch = m_ptr->
+  switch_buffer = m_ptr->EB_SWITCH;
   first  = buffer1;
   second = buffer2; 
 

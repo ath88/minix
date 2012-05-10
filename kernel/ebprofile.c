@@ -11,13 +11,6 @@
 #define mutex_lock() (void)0
 #define mutex_unlock() (void)0
 
-EXTERN void *first;
-EXTERN void *second;
-unsigned int reached; /* Where we are in the buffer */
-unsigned int *switch_buffer;
-void *active_buffer;
-void *inactive_buffer;
-
 /*
 void set_ebprof(int bitmap);
 void *get_active_buffer(void);
@@ -48,7 +41,7 @@ get_next_slot()
 	}
 	else reached++;	
 	mutex_unlock();
-	return ;
+	return NULL;
 }
 
 /* Returns whether or not profiling is enabled */

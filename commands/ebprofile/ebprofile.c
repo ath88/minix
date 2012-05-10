@@ -71,7 +71,7 @@ start ()
 	for (i=0; i<= BUFFER_SIZE; i++)
 	{
             /* Here we would write to a file or a socket or stdout */
-        	printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
+  //      	printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
 	}
   }
   return 0;
@@ -107,11 +107,11 @@ handle_args (int argc, char *argv[])
   fd = STDOUT;
 
   /* determine action */
-  if (strcmp (*argv[1], "start") == 0)
+  if (strcmp (argv[1], "start") == 0)
   {
        action = START;
   }
-  else if (strcmp (*argv[1], "stop") == 0)
+  else if (strcmp (argv[1], "stop") == 0)
   {     
        action = STOP;
   }
