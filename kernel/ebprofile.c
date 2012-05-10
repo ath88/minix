@@ -26,13 +26,6 @@ int ebp_collect(message * m_user, struct proc *caller);
 int matches_bm(int m_type);
 */
 
-
-// TODO:
-// BUFFER MANAGEMENT
-// Shared locks + shared buffer = happiness
-//     Need to get clock in kernel and userland
-// Disable interrupts
-
 void
 set_ebprof(int bitmap)
 {

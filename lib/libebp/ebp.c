@@ -35,7 +35,6 @@ ebp_start (int bitmap)
   bitmap &= 0x1;
  
   /* do syscall */ 
-  //sys_ebprof(buffers->first, buffers->second, bitmap);
   m.BUFFER1	= buffers->first;
   m.BUFFER2	= buffers->second;
   m.BITMAP	= bitmap;
@@ -73,7 +72,7 @@ ebp_get (void *buffer)
 	{	
 		relevant_buffer ? relevant_buffer = 0 : relevant_buffer = 1;
 	}
-	if (relevant_buffer == 1)
+	if (relevant_buffer)
 	{
 		memcopy(buffer, buffers->second, sizeof(kcall_sample[BUFFER_SIZE]);
 	}
