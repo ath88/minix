@@ -20,11 +20,15 @@ int matches_bm(int m_type);
 */
 
 void
-set_ebprof(int bitmap)
+set_internals(message *m_ptr)
 {
-	ebp_bm = bitmap;
+        ebp_bm  = m_ptr->EBP_BITMAP;
+        first   = m_ptr->EBP_BUFFER1;
+        second  = m_ptr->EBP_BUFFER2;
+        *relevant_buffer = 0;
 	return;
 }
+
 
 /* Returns pointer to the next free slot in the active buffer */
 void *
