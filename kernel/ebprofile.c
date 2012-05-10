@@ -1,8 +1,9 @@
 /* Kernel functions for event-based profiling
 */
 
-#include "kernel/ebprofile.h"
-#include "glo.h"
+#include <minix/config.h>
+#include "ebprofile.h"
+#include "kernel.h"
 #include "proc.h"
 
 #if EBPROFILE
@@ -12,20 +13,12 @@
 #define mutex_unlock() (void)0
 
 /*
-void set_ebprof(int bitmap);
 void *get_active_buffer(void);
 int ebprofiling(void);
 int ebp_collect(message * m_user, struct proc *caller);
 int matches_bm(int m_type);
 */
 
-void
-set_ebprof(int bitmap)
-{
-	reached = 0;
-	ebp_bm = bitmap;
-	return;
-}
 
 /* Returns pointer to active buffer */
 void *
@@ -34,12 +27,6 @@ get_next_slot()
 	int *tmp;
 	mutex_lock();
 	/* swap if full active buffer or consumer is starving */
-	if (reached == BUFFER_SIZE) //|| time()))
-	{
-		reached = 0;
-		*switch_buffer++;
-	}
-	else reached++;	
 	mutex_unlock();
 	return NULL;
 }
@@ -61,8 +48,6 @@ ebp_collect (message * m_user, struct proc *caller)
   /* Collect profiling data */ 	
   int m_type = m_user->m_type;
 
-  current_buffer = get_active_buffer(); 
-  sample = ((kcall_sample*) current_buffer)[reached];
 
   //sample.time		=
   sample.kcall 		= m_user->m_type; // This might be incorrect

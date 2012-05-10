@@ -44,6 +44,7 @@
 #include "glo.h"		/* global variables */
 #include "ipc.h"		/* IPC constants */
 #include "profile.h"		/* system profiling */
+#include "ebprofile.h"		/* event based system profiling */
 #include "perf.h"		/* performance-related definitions */
 #include "debug.h"		/* debugging, MUST be last kernel header */
 #include "cpulocals.h"

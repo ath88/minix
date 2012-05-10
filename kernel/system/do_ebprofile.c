@@ -9,13 +9,10 @@
 
 #include "kernel/system.h"
 #include <unistd.h>
-#include <minix/ebp.h>
+#include "ebprofile.h"
 
 #if EBPROFILE
 
-extern void *first; 
-extern void *second; 
-extern int *switch_buffer;
 
 /*===========================================================================*
  *				do_ebprofile				     *
@@ -27,22 +24,19 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
   void *buffer1 = m_ptr->EB_BUFFER1;
   void *buffer2 = m_ptr->EB_BUFFER2;
   int bitmap = m_ptr->EB_BITMAP;
-  unsigned int *ebp_switch;
  
   /* check if we are trying to disable profiling */ 
   if (m_ptr->EB_BUFFER1 == NULL &&
       m_ptr->EB_BUFFER1 == NULL && m_ptr->EB_BITMAP == 0)
   {
-    set_ebprof(0x0);
+//    ebp_bm = 0x0;
     return(OK);
   }
 
   /* if not, enable and set buffer & flags appropriately */
-  switch_buffer = m_ptr->EB_SWITCH;
-  first  = buffer1;
-  second = buffer2; 
-
-  set_ebprof(bitmap);
+//  first  = buffer1;
+//  second = buffer2; 
+//  ebp_bm = bitmap;
 
   return(OK);
 }

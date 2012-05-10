@@ -68,6 +68,9 @@ _PROTOTYPE( int sched_nice, (struct mproc *rmp, int nice)		);
 _PROTOTYPE( int do_sprofile, (void)					);
 _PROTOTYPE( int do_cprofile, (void)					);
 
+/* ebprofile.c */
+_PROTOTYPE( int do_ebprofile, (void)					);
+
 /* signal.c */
 _PROTOTYPE( int do_kill, (void)						);
 _PROTOTYPE( int do_srv_kill, (void)					);

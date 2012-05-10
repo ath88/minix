@@ -87,10 +87,4 @@ EXTERN u64_t bkl_ticks[CONFIG_MAX_CPUS];
 EXTERN unsigned bkl_tries[CONFIG_MAX_CPUS];
 EXTERN unsigned bkl_succ[CONFIG_MAX_CPUS];
 
-/* Event-based profiling */
-extern int ebp_bm; /* bitmap */
-extern void *first;
-extern void *second;
-extern unsigned int reached; /* Where we are in the buffer */
-
 #endif /* GLO_H */
