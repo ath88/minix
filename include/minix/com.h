@@ -597,7 +597,7 @@
 #define EBP_BUFFER1		m1_p1
 #define EBP_BUFFER2		m1_p2
 #define EBP_BITMAP		m1_i1
-#define EBP_RELBUF		m1_i2
+#define EBP_RELBUF		m1_p3
 
 #define VMMF_UNCACHED		(1L << 0)
 

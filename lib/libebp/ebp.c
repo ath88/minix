@@ -58,7 +58,7 @@ ebp_stop (void)
 
 /* Write current profiling information to buffer. */
 int
-ebp_get (void *buffer)
+ebp_get (ebp_sample_buffer *buffer)
 { 
         unsigned int tmp, reached;
         ebp_sample_buffer *buf_ptr;
@@ -79,7 +79,7 @@ ebp_get (void *buffer)
         tmp = reached;
 
         (reached <= BUFFER_SIZE) ?: (reached = BUFFER_SIZE);
-	memcpy(buffer, *buf_ptr, sizeof(kcall_sample[reached]));
+	memcpy(buffer, (void *)buf_ptr, sizeof(kcall_sample[reached]));
 
         buf_ptr->reached = 0;
         mutex_unlock();
@@ -87,7 +87,7 @@ ebp_get (void *buffer)
 }
 
 /* Allocates memory for double buffering */
-kcall_sample *
+ebp_sample_buffer *
 alloc_buffers (void)
 {
   kcall_sample *buffer;
@@ -101,11 +101,6 @@ alloc_buffers (void)
       memset (buffer, '\0', sizeof (ebp_sample_buffer));
     }
   return buffer;
-}
-
-int buffer_switched (void)
-{
-	return *switch_buffer;
 }
 
 #endif /* EBPROFILE */
