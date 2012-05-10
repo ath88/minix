@@ -2,8 +2,8 @@
  *   m_type:	SYS_EBPROFILE
  *
  * The parameters for this kernel call are:
- *    m1_i1:	EB_BUFFER1 	(first buffer for collected data)	
- *    m1_i2:	EB_BUFFER2 	(second buffer for collected data)	
+ *    m1_i1:	EBP_BUFFER1 	(first buffer for collected data)	
+ *    m1_i2:	EBP_BUFFER2 	(second buffer for collected data)	
  *    m1_i3: 	EB_BITMAP	(bitmap specifying what to profile)
  */
 
@@ -20,21 +20,20 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
 {
 /* Handle sys_ebprofile.
 */
-  void *buffer1 = m_ptr->EB_BUFFER1;
-  void *buffer2 = m_ptr->EB_BUFFER2;
+  void *buffer1 = m_ptr->EBP_BUFFER1;
+  void *buffer2 = m_ptr->EBP_BUFFER2;
   int bitmap = m_ptr->EB_BITMAP;
-  unsigned int *ebp_switch;
+  unsigned int relevant_buffer = m_ptr->EBP_RELBUF;
  
   /* check if we are trying to disable profiling */ 
-  if (m_ptr->EB_BUFFER1 == NULL &&
-      m_ptr->EB_BUFFER1 == NULL && m_ptr->EB_BITMAP == 0)
+  if (m_ptr->EBP_BUFFER1 == NULL &&
+      m_ptr->EBP_BUFFER1 == NULL && m_ptr->EB_BITMAP == 0)
   {
     set_ebprof(0x0);
     return(OK);
   }
 
   /* if not, enable and set buffer & flags appropriately */
-  ebp_switch = m_ptr->
   first  = buffer1;
   second = buffer2; 
 

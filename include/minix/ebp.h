@@ -14,7 +14,6 @@
 
 #define BUFFER_SIZE 1024 // has to match with kernel/ebprofile.h
 
-// COPY OF STRUCT FROM kernel/ebprofile.h !!!! 
 typedef struct
 {
   int time;
@@ -31,9 +30,16 @@ typedef struct
 
 typedef struct
 {
-  void *first;
-  void *second;
+  ebp_sample_buffer *first;
+  ebp_sample_buffer *second;
 } ebp_buffers;
+
+typedef struct
+{
+  kcall_sample sample[BUFFER_SIZE];
+  unsigned int reached;
+  int lock;
+} ebp_sample_buffer;
 
 /* userland functions */
 ebp_buffers *ebp_start (int bitmap);

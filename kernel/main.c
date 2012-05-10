@@ -48,6 +48,7 @@ PUBLIC void bsp_finish_booting(void)
   void *first;
   void *second;
   int *switch_buffer;
+  int relevant_buffer;
 #endif /* EBPROFILE */
 
   cprof_procs_no = 0;  /* init nr of hash table slots used */
