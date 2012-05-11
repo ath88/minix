@@ -5,6 +5,7 @@
 #include "kernel.h"
 #include "proc.h"
 #include <stdio.h>
+#include <assert.h>
 
 #if EBPROFILE
 
@@ -15,11 +16,12 @@
 void
 set_internals(message *m_ptr)
 {
-(void)fprintf(stdout,"Set internals1");
+(void)fprintf(stdout,"Set internals1\n");
         ebp_bm              = m_ptr->EBP_BITMAP;
         ebp_first           = (ebp_sample_buffer*) m_ptr->EBP_BUFFER1;
         ebp_second          = (ebp_sample_buffer*) m_ptr->EBP_BUFFER2;
         ebp_relevant_buffer = (unsigned int*) m_ptr->EBP_RELBUF;
+(void)fprintf(stdout,"Set internals2\n");
 	return;
 }
 
@@ -28,17 +30,26 @@ set_internals(message *m_ptr)
 kcall_sample
 get_next_slot()
 {
+(void)fprintf(stdout,"get_next_slot0\n");
         kcall_sample free_sample;
+(void)fprintf(stdout,"get_next_slot1\n");
+        (void)fprintf(stdout,"relevant buffer is at %d\n",(int)ebp_relevant_buffer);
+        (void)fprintf(stdout,"relevant buffer is %d\n",*ebp_relevant_buffer);
         if (*ebp_relevant_buffer == 0)
         {
+(void)fprintf(stdout,"get_next_slot11\n");
                 free_sample = ebp_first->sample[ebp_first->reached];
                 ebp_first->reached++;
+(void)fprintf(stdout,"get_next_slot12\n");
         }
         else
         {
+(void)fprintf(stdout,"get_next_slot13\n");
                 free_sample = ebp_second->sample[ebp_second->reached];
                 ebp_second->reached++;
+(void)fprintf(stdout,"get_next_slot14\n");
         }
+(void)fprintf(stdout,"get_next_slot2\n");
         return free_sample;
 }
 
@@ -46,6 +57,7 @@ get_next_slot()
 int
 ebprofiling()
 {
+//(void)fprintf(stdout,"profiling?\n");
 	return ebp_bm & 0x1; // first bit
 }
 
