@@ -9,7 +9,6 @@
 #include <minix/com.h>
 #include <minix/priv.h>
 #include <minix/const.h>
-#include "kernel.h"
 #include "proc.h"
 
 #if EBPROFILE
@@ -28,11 +27,6 @@
 
 #define BUFFER_SIZE	1024
 
-/* Event-based profiling */
-EXTERN int ebp_bm; /* bitmap */
-EXTERN void *first;
-EXTERN void *second;
-EXTERN unsigned int *relevant_buffer; /* Where we are in the buffer */
 
 typedef struct
 {
@@ -60,6 +54,13 @@ void *get_active_buffer(void);
 int ebprofiling(void);
 int ebp_collect (message * m_user, struct proc *caller);
 int matches_bm(int m_type);
+
+
+/* Event-based profiling */
+EXTERN int ebp_bm; 			/* bitmap */
+EXTERN ebp_sample_buffer *ebp_first;
+EXTERN ebp_sample_buffer *ebp_second;
+EXTERN unsigned int *ebp_relevant_buffer; 	/* Where we are in the buffer */
 
 #endif /* EBPROFILE */
 #endif /* _KE_EBPROF_H */

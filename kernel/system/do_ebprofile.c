@@ -24,7 +24,7 @@ int do_ebprofile(struct proc * caller, message * m_ptr)
   void *buffer1 = m_ptr->EBP_BUFFER1;
   void *buffer2 = m_ptr->EBP_BUFFER2;
   int bitmap = m_ptr->EBP_BITMAP;
-  unsigned int relevant_buffer = m_ptr->EBP_RELBUF;
+  unsigned int *relevant = (unsigned int *) m_ptr->EBP_RELBUF;
  
   /* check if we are trying to disable profiling */ 
   if (m_ptr->EBP_BUFFER1 == NULL &&

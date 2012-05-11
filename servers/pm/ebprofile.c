@@ -18,7 +18,7 @@
 PUBLIC int do_ebprofile(void)
 {
 #if EBPROFILE
-	return sys_ebprof(m_in.BUFFER1, m_in.BUFFER2, m_in.BITMAP, m_in.EBP_RELBUF);
+	return sys_ebprof(m_in.EBP_BUFFER1, m_in.EBP_BUFFER2, m_in.EBP_BITMAP, m_in.EBP_RELBUF);
 #else
 	return ENOSYS;
 #endif 
