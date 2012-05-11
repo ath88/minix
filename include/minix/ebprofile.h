@@ -36,11 +36,18 @@ typedef struct
   struct priv *p_priv;
 } kcall_sample;
 
+typedef struct
+{
+  kcall_sample sample[BUFFER_SIZE];
+  unsigned int reached;
+  int lock;
+} ebp_sample_buffer;
+
 
 typedef struct
 {
-  void *first;
-  void *second;
+  ebp_sample_buffer *first;
+  ebp_sample_buffer *second;
 } ebp_buffers;
 
 /* userland functions */

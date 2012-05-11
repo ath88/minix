@@ -37,25 +37,35 @@ main (int argc, char *argv[])
     {
     case HELP:
       help ();
+      break;
     case START:
-      start ();
+      start();
+      break;
     case STOP:
       stop ();
-    default:
-      printf ("Incorrect arguments.\n");
-      help ();
+      break;
     }
+  exit(0);
 }
 
 /* Initializes buffers and starts profiling. */
 int
 start ()
 {
+  printf("Starting..\n");
   ebp_buffers *buffers;
   kcall_sample *consumer_buffer = (kcall_sample *) malloc(sizeof(kcall_sample[BUFFER_SIZE]));
+  if (consumer_buffer == NULL) 
+  {
+    printf("malloc failed");
+    return 1;
+  }
+  printf("1\n");
 
   /* Allocates buffers and start profiling */
   buffers = ebp_start(0xFFF); // test bitmap, profiles everything
+  //ebp_start(0xFFF); // test bitmap, profiles everything
+  printf("2\n");
 
   /* Loop consumer, read buffers and write to file or socket */
   int i, j;
@@ -63,17 +73,21 @@ start ()
 
   /* NEW FILE OR SOCKET MAGIC */
 
-  while (j != 1000)
+  printf("3\n");
+  while (1)
   {
 	j++;
+       	printf("m_type = %d\n", buffers->first->reached);
+	sleep(1);
 	if (!ebp_get(consumer_buffer))
 		continue;
 	for (i=0; i<= BUFFER_SIZE; i++)
 	{
             /* Here we would write to a file or a socket or stdout */
-  //      	printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
+       	//printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
 	}
   }
+  printf("4\n");
   return 0;
 }
 
@@ -81,6 +95,7 @@ start ()
 // TODO pkill process, if exists. probably needs to report back to user what happened
 int
 stop () {
+  printf("Stopping");
   ebp_stop();
   //sigaction(SIGKILL); // Read docs, noobz
   return 0;
@@ -95,6 +110,7 @@ help ()
   printf ("  |  ebprofile stop \n");
   printf ("  |  ebprofile [-h] \n");
   printf ("Use ebprofalyze.pl to analyze output file.\n");
+  sleep(1);
   return;
 }
 
@@ -106,6 +122,8 @@ handle_args (int argc, char *argv[])
   daemonize = 0;
   fd = STDOUT;
 
+  if (argv[1] == NULL) return HELP;
+
   /* determine action */
   if (strcmp (argv[1], "start") == 0)
   {
@@ -115,11 +133,10 @@ handle_args (int argc, char *argv[])
   {     
        action = STOP;
   }
-  else
-       action = HELP;
+  else return HELP;
 
   /* parse options */
-  while ((c = getopt(++argc, argv, "f:n:d")) != -1)
+  while ((c = getopt(++argc, argv, "f:n:dh")) != -1)
     {
       switch(c)
       {
@@ -134,38 +151,15 @@ handle_args (int argc, char *argv[])
           case 'd':
                 daemonize = 1;
                 break;
+          case 'h':
+           	action = HELP;
+                break;
           default:
                 printf("Unknown option character.\n");
-                break; 
+                action = HELP;
       }
     }
    return action;
 }  
-
-/*
-int
-handle_args (int argc, char *argv[])
-{
-  while (--argc)
-    {
-      ++argv;
-      if (strcmp (*argv, "-h") == 0 || strcmp (*argv, "help") == 0 ||
-	  strcmp (*argv, "--help") == 0)
-	{
-	  return HELP;
-	}
-      else if (strcmp (*argv, "start") == 0)
-        {
-	  return START;
-	}
-      else if (strcmp (*argv, "stop") == 0)
-	{
-	  return STOP;
-	}
-
-    }
-    return HELP;
-}*/
-
 
 #endif

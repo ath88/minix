@@ -22,21 +22,31 @@ ebp_buffers *buffers;
 ebp_buffers *
 ebp_start (int bitmap)
 {
+  (void)fprintf(stdout,"LIB start1\n");
   message m;
-  buffers->first  = alloc_buffers();
+  (void)fprintf(stdout,"LIB start101\n");
+  buffers = malloc(sizeof(ebp_buffers));
+  (void)fprintf(stdout,"LIB start11\n");
+  buffers->first = alloc_buffers();
+  (void)fprintf(stdout,"LIB start12\n");
   buffers->second = alloc_buffers();
+  (void)fprintf(stdout,"LIB start13\n");
   relevant_buffer = malloc(sizeof(int));
+  (void)fprintf(stdout,"LIB start2\n");
 
   /* Set profiling flag */
   bitmap &= 0x1;
  
+  (void)fprintf(stdout,"LIB start3\n");
   /* do syscall */ 
   m.EBP_BUFFER1	= buffers->first;
   m.EBP_BUFFER2	= buffers->second;
   m.EBP_RELBUF  = relevant_buffer;
   m.EBP_BITMAP	= bitmap;
 
+  (void)fprintf(stdout,"LIB start4\n");
   _syscall(PM_PROC_NR, EBPROF, &m);
+  (void)fprintf(stdout,"LIB start5\n");
   return buffers;
 }
 
@@ -90,8 +100,10 @@ ebp_get (ebp_sample_buffer *buffer)
 ebp_sample_buffer *
 alloc_buffers (void)
 {
+  fprintf(stdout,"allocB start\n");
   ebp_sample_buffer *buffer;
   buffer = malloc (sizeof (ebp_sample_buffer));
+  fprintf(stdout,"allocB start2\n");
   if (buffer == NULL)
     {
       printf("Could not allocate buffers. Disabling event-based profiling.\n");
@@ -102,6 +114,7 @@ alloc_buffers (void)
      buffer->lock = 0;
      buffer->reached = 0;
     }
+  fprintf(stdout,"allocB start3\n");
   return buffer;
 }
 
