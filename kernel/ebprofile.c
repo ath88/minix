@@ -58,6 +58,7 @@ printf("get_next_slot2\n");
 int
 ebprofiling()
 {
+//(void)fprintf(stdout,"profiling?\n");
 	return ebp_bm & 0x1; // first bit
 }
 
