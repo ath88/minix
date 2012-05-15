@@ -49,7 +49,7 @@ typedef struct
 } ebp_sample_buffer;
 
 /* kernel functions */
-void set_ebprof(int bitmap);
+void set_internals(message * mptr);
 void *get_active_buffer(void);
 int ebprofiling(void);
 int ebp_collect (message * m_user, struct proc *caller);

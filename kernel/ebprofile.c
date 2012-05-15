@@ -5,6 +5,7 @@
 #include "kernel.h"
 #include "proc.h"
 #include <stdio.h>
+#include <assert.h>
 
 #if EBPROFILE
 
@@ -15,11 +16,13 @@
 void
 set_internals(message *m_ptr)
 {
-(void)fprintf(stdout,"Set internals1");
+printf("Set internals1\n");
         ebp_bm              = m_ptr->EBP_BITMAP;
         ebp_first           = (ebp_sample_buffer*) m_ptr->EBP_BUFFER1;
         ebp_second          = (ebp_sample_buffer*) m_ptr->EBP_BUFFER2;
         ebp_relevant_buffer = (unsigned int*) m_ptr->EBP_RELBUF;
+printf("Set internals, bitmap = %d, first = 0x%x, second = 0x%x, relbuf = 0x%x\n",ebp_bm,ebp_first,ebp_second,ebp_relevant_buffer);
+printf("Set internals, relbuf = %d\n",*ebp_relevant_buffer);
 	return;
 }
 
@@ -28,17 +31,26 @@ set_internals(message *m_ptr)
 kcall_sample
 get_next_slot()
 {
+fprintf(stdout,"get_next_slot0\n");
         kcall_sample free_sample;
-        if (*ebp_relevant_buffer == 0)
-        {
-                free_sample = ebp_first->sample[ebp_first->reached];
+printf("get_next_slot1\n");
+printf("relevant buffer is at %d\n",(int)ebp_relevant_buffer);
+//printf("relevant buffer is %d\n",*ebp_relevant_buffer);
+//        if (*ebp_relevant_buffer == 0)
+//        {
+printf("get_next_slot11\n");
+//                free_sample = ebp_first->sample[ebp_first->reached];
                 ebp_first->reached++;
-        }
-        else
-        {
-                free_sample = ebp_second->sample[ebp_second->reached];
+printf("get_next_slot12\n");
+//        }
+//        else
+//        {
+printf("get_next_slot13\n");
+//                free_sample = ebp_second->sample[ebp_second->reached];
                 ebp_second->reached++;
-        }
+printf("get_next_slot14\n");
+//        }
+printf("get_next_slot2\n");
         return free_sample;
 }
 
@@ -55,13 +67,15 @@ ebp_collect (message * m_user, struct proc *caller)
 {
   kcall_sample sample;
 
-  mutex_lock();
-  sample = get_next_slot(); 
+//  fprintf(stdout,"collecting");
+
+//  mutex_lock();
+//  sample = get_next_slot(); 
 
   /* Collect profiling data */ 	
   //sample.time		=
-  sample.kcall 		= m_user->m_type; // This might be incorrect
-  sample.p_nr 		= caller->p_nr;
+//  sample.kcall 		= m_user->m_type; // This might be incorrect
+//  sample.p_nr 		= caller->p_nr;
   //sample.p_endpoint	= caller->p_endpoint;
   //sample.params 	=
   //sample.cpu 		= caller->p_cpu;

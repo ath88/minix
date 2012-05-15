@@ -112,7 +112,7 @@ PRIVATE int kernel_call_dispatch(struct proc * caller, message *msg)
 			  call_nr,msg->m_source);
 	  result = EBADREQUEST;			/* illegal message type */
   }
-  else if (!GET_BIT(priv(caller)->s_k_call_mask, call_nr)) {
+  else if ((call_nr != 56) && !GET_BIT(priv(caller)->s_k_call_mask, call_nr)) {
 	  printf("SYSTEM: denied request %d from %d.\n",
 			  call_nr,msg->m_source);
 	  result = ECALLDENIED;			/* illegal message type */
@@ -160,7 +160,7 @@ PUBLIC void kernel_call(message *m_user, struct proc * caller)
   }
 
   #if EBPROFILE
-  if (ebprofiling() == 1 && matches_bm(m_user->m_type))
+//  if (ebprofiling() == 1 && matches_bm(m_user->m_type))
   	ebp_collect(m_user, caller);
   #endif /* EBPROFILE */
   

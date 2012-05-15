@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <lib.h>
 #include <minix/ebp.h>
 #include <minix/syslib.h>
 #include <minix/callnr.h>
@@ -35,7 +36,7 @@ ebp_start (int bitmap)
   (void)fprintf(stdout,"LIB start2\n");
 
   /* Set profiling flag */
-  bitmap &= 0x1;
+  bitmap &= 0xFFF;
  
   (void)fprintf(stdout,"LIB start3\n");
   /* do syscall */ 
@@ -43,9 +44,11 @@ ebp_start (int bitmap)
   m.EBP_BUFFER2	= buffers->second;
   m.EBP_RELBUF  = relevant_buffer;
   m.EBP_BITMAP	= bitmap;
-
-  (void)fprintf(stdout,"LIB start4\n");
-  _syscall(PM_PROC_NR, EBPROF, &m);
+  m.m_type      = SYS_EBPROF;
+  (void)fprintf(stdout,"LIB start4 newer\n");
+  sleep(1);
+  _do_kernel_call(&m);
+//  _syscall(PM_PROC_NR, EBPROF, &m);
   (void)fprintf(stdout,"LIB start5\n");
   return buffers;
 }
