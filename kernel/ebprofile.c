@@ -6,6 +6,8 @@
 #include "proc.h"
 #include <stdio.h>
 #include <assert.h>
+#include <unistd.h>
+#include <sys/mman.h>
 
 #if EBPROFILE
 
@@ -22,7 +24,16 @@ printf("Set internals1\n");
         ebp_second          = (ebp_sample_buffer*) m_ptr->EBP_BUFFER2;
         ebp_relevant_buffer = (unsigned int*) m_ptr->EBP_RELBUF;
 printf("Set internals, bitmap = %d, first = 0x%x, second = 0x%x, relbuf = 0x%x\n",ebp_bm,ebp_first,ebp_second,ebp_relevant_buffer);
-printf("Set internals, relbuf = %d\n",*ebp_relevant_buffer);
+
+printf("Set internals2\n");
+        unsigned int *ret = (unsigned int *) 1337;
+printf("Set internals20, relbuf = %d\n",ret);
+//        ret = (unsigned int *) vm_getphys(getprocnr(), (void*)ebp_relevant_buffer);
+
+printf("Set internals21, relbuf = %d\n",ret);
+printf("Set internals22, relbuf = %d\n",*ret);
+printf("Set internals3");
+
 	return;
 }
 
