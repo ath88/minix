@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
 #include <lib.h>
 #include <minix/ebp.h>
 #include <minix/syslib.h>
@@ -42,12 +44,15 @@ ebp_start (int bitmap)
   /* do syscall */ 
   m.EBP_BUFFER1	= buffers->first;
   m.EBP_BUFFER2	= buffers->second;
-  m.EBP_RELBUF  = relevant_buffer;
+//  m.EBP_RELBUF  = relevant_buffer;
+
+  m.EBP_RELBUF = (unsigned int *) vm_getphys(getprocnr(), (void*)relevant_buffer);
+
   m.EBP_BITMAP	= bitmap;
   m.m_type      = SYS_EBPROF;
   (void)fprintf(stdout,"LIB start4 newer\n");
   sleep(1);
-  _do_kernel_call(&m);
+  printf("RETVAL: 0x%x\n",_do_kernel_call(&m));
 //  _syscall(PM_PROC_NR, EBPROF, &m);
   (void)fprintf(stdout,"LIB start5\n");
   return buffers;
