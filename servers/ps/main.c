@@ -1,4 +1,4 @@
-/* Profiling Server. 
+/* Profiling Service. 
  * This service implements functions for intercepting messages to the kernel
  * and gather event-based profiling data such as which kernel calls are invoked.
  */
