@@ -1,6 +1,6 @@
 # Makefile for Profiling Server (PS)
 PROG=	ps
-SRCS=	main.c store.c
+SRCS=	main.c
 
 DPADD+=	${LIBSYS}
 LDADD+=	-lsys
