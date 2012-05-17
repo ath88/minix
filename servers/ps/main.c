@@ -7,14 +7,15 @@
 #include <minix/endpoint.h>
 
 /* Allocate space for the global variables. */
-//PRIVATE endpoint_t who_e;	/* caller's proc number */
-//PRIVATE int callnr;		/* system call number */
+PRIVATE endpoint_t who_e;	/* caller's proc number */
+PRIVATE int callnr;		/* system call number */
 
 /* Declare some local functions. */
-//FORWARD _PROTOTYPE(void reply, (endpoint_t whom, message *m_ptr)	);
+FORWARD _PROTOTYPE(void get_work, (message *m_ptr)                      );
+FORWARD _PROTOTYPE(void reply, (endpoint_t whom, message *m_ptr)	);
 
 /* SEF functions and variables. */
-//FORWARD _PROTOTYPE( void sef_local_startup, (void) );
+FORWARD _PROTOTYPE( void sef_local_startup, (void) );
 
 /*===========================================================================*
  *				main                                         *
@@ -39,38 +40,16 @@ PUBLIC int main(int argc, char **argv)
       get_work(&m);
 
       if (is_notify(callnr)) {
-          printf("DS: warning, got illegal notify from: %d\n", m.m_source);
+          printf("PS: warning, got illegal notify from: %d\n", m.m_source);
           result = EINVAL;
           goto send_reply;
       }
 
       switch (callnr) {
-      case DS_PUBLISH:
-          result = do_publish(&m);
-          break;
-      case DS_RETRIEVE:
-	  result = do_retrieve(&m);
-	  break;
-      case DS_RETRIEVE_LABEL:
-	  result = do_retrieve_label(&m);
-	  break;
-      case DS_DELETE:
-	  result = do_delete(&m);
-	  break;
-      case DS_SUBSCRIBE:
-	  result = do_subscribe(&m);
-	  break;
-      case DS_CHECK:
-	  result = do_check(&m);
-	  break;
-      case DS_SNAPSHOT:
-	  result = do_snapshot(&m);
-	  break;
-      case COMMON_GETSYSINFO:
-	  result = do_getsysinfo(&m);
+      case 1:
 	  break;
       default: 
-          printf("DS: warning, got illegal request from %d\n", m.m_source);
+          printf("PS: warning, got illegal request from %d\n", m.m_source);
           result = EINVAL;
       }
 
@@ -90,8 +69,6 @@ send_reply:
 PRIVATE void sef_local_startup()
 {
   /* Register init callbacks. */
-  sef_setcb_init_fresh(sef_cb_init_fresh);
-  sef_setcb_init_restart(sef_cb_init_fail);
 
   /* No live update support for now. */
 
@@ -123,6 +100,6 @@ PRIVATE void reply(
 {
     int s = send(who_e, m_ptr);    /* send the message */
     if (OK != s)
-        printf("DS: unable to send reply to %d: %d\n", who_e, s);
+        printf("PS: unable to send reply to %d: %d\n", who_e, s);
 }
 
