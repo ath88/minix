@@ -167,8 +167,9 @@ PUBLIC int main()
            m_out->RS_NAME_LEN = (int) sizeof(name);
            m_out->RS_NAME = name;
            send(RS_PROC_NR, m_out);
+           // Receive message
+           pros_proc_nr = ;
         }
-
         /* Send message to pros */ 
         asynsend(pros_proc_nr, m_in);
 #endif
