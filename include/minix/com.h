@@ -1264,7 +1264,7 @@
  *			Messages for block devices			     *
  *===========================================================================*/
 
-#define PROS_BASE       0x1500 
+#define PROS_BASE       0x1600 
 
 #define PROS_CTL	(PROS_BASE + 0)	/* control profiling */
 
