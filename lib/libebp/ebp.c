@@ -87,6 +87,7 @@ PRIVATE int custom_config_file = 0;
 PRIVATE int req_lu_state = DEFAULT_LU_STATE;
 PRIVATE int req_lu_maxtime = DEFAULT_LU_MAXTIME;
 
+PRIVATE void failure(int request);
 
 int relevant_buffer;
 ebp_buffers *buffers;
@@ -94,21 +95,21 @@ ebp_buffers *buffers;
 int
 start_ebp_server()
 {
+  printf("startserver 0\n");
   message m;
   int request = RS_UP;
   int result = EXIT_SUCCESS;
-  char *progname = "/usr/sbin/pros";
+  char *progname = "pros";
+  strcpy(command, "/usr/sbin/pros ");
   /* Arguments for RS to start a new service */
   struct rs_config config;
   u32_t rss_flags = 0;
 
+  printf("startserver 1\n");
 
-  /* Build space-separated command string to be passed to RS server. */
   assert(progname); /* an absolute path was required */
-  progname++;       /* skip last slash */
-  strcpy(command, req_path);
-  command[strlen(req_path)] = ' ';
-  strcpy(command+strlen(req_path)+1, req_args);
+
+  printf("startserver 2\n");
 
   if (req_config) {
     assert(progname);
@@ -116,6 +117,8 @@ start_ebp_server()
     if(!parse_config(progname, custom_config_file, req_config, &config))
     errx(1, "couldn't parse config");
   }
+
+  printf("startserver 3\n");
 
 
   /* Set specifics */
@@ -141,6 +144,8 @@ start_ebp_server()
   assert(config.rs_start.rss_priority < NR_SCHED_QUEUES);
   assert(config.rs_start.rss_quantum > 0);
 
+  printf("startserver 4\n");
+
   m.RS_CMD_ADDR = (char *) &config.rs_start;
 
   /* Build request message and send the request. */
@@ -150,6 +155,8 @@ start_ebp_server()
     result = m.m_type;
   }
 
+  printf("startserver 5\n");
+
   return result;
 }
 
@@ -157,11 +164,18 @@ start_ebp_server()
 ebp_buffers *
 ebp_start (int bitmap)
 {
+  endpoint_t endpoint;
 
-  if(start_ebp_server())
+  if(start_ebp_server() == OK)
   {
     printf("ebpserver started\n");
   } else printf("ebpserver not startet\n");
+
+  printf("ebpserver pid addr = %x\n",&endpoint);
+  minix_rs_lookup("pros",&endpoint);
+
+  printf("ebpserver pid addr = %x\n",&endpoint);
+  printf("ebpserver pid = %d\n",endpoint);
 
   (void)fprintf(stdout,"LIB start1\n");
   message m;
@@ -180,16 +194,14 @@ ebp_start (int bitmap)
  
   (void)fprintf(stdout,"LIB start3\n");
   /* do syscall */ 
-  m.EBP_BUFFER1	= buffers->first;
-  m.EBP_BUFFER2	= buffers->second;
-  m.EBP_RELBUF  = relevant_buffer;
+  m.PROS_BUFFER1	= buffers->first;
+  m.PROS_BUFFER2	= buffers->second;
+  m.PROS_RELBUF  = relevant_buffer;
+  m.PROS_BITMAP	= bitmap;
 
-
-  m.EBP_BITMAP	= bitmap;
-  m.m_type      = SYS_EBPROF;
   (void)fprintf(stdout,"LIB start4 newer\n");
   sleep(1);
-//  _syscall(PM_PROC_NR, EBPROF, &m);
+  _syscall(endpoint, PROS_CTL, &m);
   (void)fprintf(stdout,"LIB start5\n");
   return buffers;
 }
@@ -199,14 +211,14 @@ void
 ebp_stop (void)
 {
   message m;
-  m.EBP_BUFFER1	= NULL;
-  m.EBP_BUFFER2	= NULL;
-  m.EBP_BITMAP	= 0x0;
-  m.EBP_RELBUF	= 0x0;
+  m.PROS_BUFFER1	= NULL;
+  m.PROS_BUFFER2	= NULL;
+  m.PROS_BITMAP		= 0x0;
+  m.PROS_RELBUF		= 0x0;
   free(buffers->first);
   free(buffers->second);
   free(relevant_buffer);
-  _syscall(PM_PROC_NR, EBPROF, &m);
+//  _syscall(PM_PROC_NR, EBPROF, &m);
   return;
 }
 
@@ -261,5 +273,15 @@ alloc_buffers (void)
   fprintf(stdout,"allocB start3\n");
   return buffer;
 }
+
+/* A request to the RS server failed. Report and exit. 
+ */
+PRIVATE void failure(int request)
+{
+  fprintf(stderr, "Request 0x%x to RS failed: %s (error %d)\n", request, strerror(errno), errno);
+  exit(errno);
+}
+
+
 
 #endif /* EBPROFILE */

@@ -18,6 +18,7 @@
 #include <minix/rs.h>
 #include <minix/syslib.h>
 #include <minix/bitmap.h>
+#include <minix/priv.h>
 #include <paths.h>
 #include <minix/sef.h>
 #include <minix/dmap.h>
@@ -27,7 +28,6 @@
 
 #include <machine/archtypes.h>
 #include <timers.h>
-#include "kernel/proc.h"
 
 #include "config.h"
 #include "proto.h"

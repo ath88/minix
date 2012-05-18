@@ -52,8 +52,8 @@ typedef struct
 /* userland functions */
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
-int ebp_get (void *buffer);
-kcall_sample *alloc_buffers (void);
+int ebp_get (ebp_sample_buffer *buffer);
+ebp_sample_buffer *alloc_buffers (void);
 int buffer_switched (void);
 
 #endif /* _TOOL_EBPROF_H */

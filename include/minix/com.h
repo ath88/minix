@@ -1260,4 +1260,18 @@
 #  define BDEV_NOFLAGS		0x00	/* no flags are set */
 #  define BDEV_FORCEWRITE	0x01	/* force write to disk immediately */
 
+/*===========================================================================*
+ *			Messages for block devices			     *
+ *===========================================================================*/
+
+#define PROS_BASE       0x1500 
+
+#define PROS_CTL	(PROS_BASE + 0)	/* control profiling */
+
+#define PROS_BUFFER1	m7_i1	
+#define PROS_BUFFER2	m7_i2	
+#define PROS_RELBUF	m7_i3	
+#define PROS_BITMAP	m7_i4	
+
+
 /* _MINIX_COM_H */

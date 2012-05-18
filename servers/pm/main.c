@@ -157,14 +157,14 @@ PUBLIC int main()
 	if (result != SUSPEND) setreply(who_p, result);
 	sendreply();
        
-#if EBPROFILE
+#if EBPROFILExx
         /* If pros process number is not cached, look it up */
         if (!pros_proc_nr)
         {
             minix_rs_lookup("pros", pros_proc_nr);
         }
         /* Send message to pros */ 
-        asynsend(pros_proc_nr, m_in);
+        asynsend(pros_proc_nr, &m_in);
 #endif
   }
   return(OK);
