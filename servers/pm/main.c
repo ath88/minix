@@ -51,6 +51,10 @@ FORWARD _PROTOTYPE( void sef_local_startup, (void) );
 FORWARD _PROTOTYPE( int sef_cb_init_fresh, (int type, sef_init_info_t *info) );
 FORWARD _PROTOTYPE( int sef_cb_signal_manager, (endpoint_t target, int signo) );
 
+#if EBPROFILE
+EXTERN endpoint_t pros_proc_nr;
+#endif
+
 /*===========================================================================*
  *				main					     *
  *===========================================================================*/
@@ -58,10 +62,12 @@ PUBLIC int main()
 {
 /* Main routine of the process manager. */
   int result;
-
+  
   /* SEF local startup. */
   sef_local_startup();
 
+  pros_proc_nr = 0;
+  
   /* This is PM's main loop-  get work and do it, forever and forever. */
   while (TRUE) {
 	  int ipc_status;
@@ -149,6 +155,23 @@ PUBLIC int main()
 	/* Send reply. */
 	if (result != SUSPEND) setreply(who_p, result);
 	sendreply();
+       
+#if EBPROFILE
+        /* If pros process number is not cached, look it up */
+        if (!pros_proc_nr)
+        {
+           message *m_out;
+           char *name = "pros";
+           m_out->m_type = RS_LOOKUP;
+           m_out->m_source = getprocnr();
+           m_out->RS_NAME_LEN = (int) sizeof(name);
+           m_out->RS_NAME = name;
+           send(RS_PROC_NR, m_out);
+        }
+
+        /* Send message to pros */ 
+        asynsend(pros_proc_nr, m_in);
+#endif
   }
   return(OK);
 }
