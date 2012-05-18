@@ -52,7 +52,7 @@ start ()
 {
   printf("Starting..\n");
   ebp_buffers *buffers;
-  kcall_sample *consumer_buffer = (kcall_sample *) malloc(sizeof(kcall_sample[BUFFER_SIZE]));
+  ebp_sample_buffer *consumer_buffer = (ebp_sample_buffer *) malloc(sizeof(kcall_sample[BUFFER_SIZE]));
   if (consumer_buffer == NULL) 
   {
     printf("malloc failed");
@@ -61,8 +61,9 @@ start ()
   printf("1\n");
 
   /* Allocates buffers and start profiling */
-  buffers = ebp_start(0xFFF); // test bitmap, profiles everything
-  //ebp_start(0xFFF); // test bitmap, profiles everything
+  //buffers = ebp_start(0xFFF); // test bitmap, profiles everything
+  ebp_start(0xFFF); // test bitmap, profiles everything
+
   printf("2\n");
 
   /* Loop consumer, read buffers and write to file or socket */
