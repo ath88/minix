@@ -10,8 +10,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#if EBPROFILE
-
 int c;
 int daemonize;
 int fd;
@@ -162,4 +160,3 @@ handle_args (int argc, char *argv[])
    return action;
 }  
 
-#endif

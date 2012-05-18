@@ -5,12 +5,12 @@
 *  for the ebprofile tool.
 */
 
+#include <minix/config.h>
 #include <minix/ipc.h>
 #include <minix/com.h>
 #include <minix/priv.h>
 #include <minix/const.h>
 
-#if EBPROFILE
 
 #define HELP  0
 #define START 1
@@ -56,5 +56,4 @@ int ebp_get (void *buffer);
 kcall_sample *alloc_buffers (void);
 int buffer_switched (void);
 
-#endif /* EBPROFILE */
 #endif /* _TOOL_EBPROF_H */

@@ -2,7 +2,7 @@
 LIB=	ebp
 INCSDIR= /usr/include/sys
 
-SRCS+=	ebp.c 
+SRCS+=	ebp.c parse.c
 LDADD+= -lsys
 
 .include <bsd.lib.mk>
