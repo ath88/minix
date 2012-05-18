@@ -40,12 +40,11 @@ PUBLIC int main(int argc, char **argv)
       /* Wait for incoming message, sets 'callnr' and 'who'. */
       get_work(&m);
 
-      if (is_notify(callnr)) { //What does this do?
-          printf("PROS: warning, got illegal notify from: %d\n", m.m_source);
-          result = EINVAL;
-      }
-      printf("callnr: %d\n", callnr);
-      printf("who called: %d\n", who_e);
+      switch (callnr)
+          case PROS
+
+
+
   }
   return(OK);				/* shouldn't come here */
 }
