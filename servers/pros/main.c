@@ -44,11 +44,11 @@ PUBLIC int main(int argc, char **argv)
           printf("PROS: warning, got illegal notify from: %d\n", m.m_source);
           result = EINVAL;
       }
-   
+      printf("callnr: %d\n", callnr);
+      printf("who called: %d\n", who_e);
   }
   return(OK);				/* shouldn't come here */
 }
-
 
 /*===========================================================================*
  *				write_buffer                                 *

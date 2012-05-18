@@ -14,6 +14,7 @@
 #include <minix/callnr.h>
 #include <minix/com.h>
 #include <minix/ds.h>
+#include <minix/rs.h>
 #include <minix/type.h>
 #include <minix/endpoint.h>
 #include <minix/minlib.h>
@@ -52,7 +53,7 @@ FORWARD _PROTOTYPE( int sef_cb_init_fresh, (int type, sef_init_info_t *info) );
 FORWARD _PROTOTYPE( int sef_cb_signal_manager, (endpoint_t target, int signo) );
 
 #if EBPROFILE
-EXTERN endpoint_t pros_proc_nr;
+endpoint_t *pros_proc_nr;
 #endif
 
 /*===========================================================================*
@@ -160,15 +161,7 @@ PUBLIC int main()
         /* If pros process number is not cached, look it up */
         if (!pros_proc_nr)
         {
-           message *m_out;
-           char *name = "pros";
-           m_out->m_type = RS_LOOKUP;
-           m_out->m_source = getprocnr();
-           m_out->RS_NAME_LEN = (int) sizeof(name);
-           m_out->RS_NAME = name;
-           send(RS_PROC_NR, m_out);
-           // Receive message
-           pros_proc_nr = ;
+            minix_rs_lookup("pros", pros_proc_nr);
         }
         /* Send message to pros */ 
         asynsend(pros_proc_nr, m_in);
