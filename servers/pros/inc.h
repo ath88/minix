@@ -1,5 +1,5 @@
-#ifndef _PS_INC_H
-#define _PS_INC_H
+#ifndef _PROS_INC_H
+#define _PROS_INC_H
 
 /* Header file including all needed system headers. */
 
@@ -32,4 +32,4 @@
 #include <signal.h>
 
 #include "proto.h"
-#endif /* _PS_INC_H */
+#endif /* _PROS_INC_H */

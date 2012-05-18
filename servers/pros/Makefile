@@ -1,5 +1,5 @@
-# Makefile for Profiling Server (PS)
-PROG=	ps
+# Makefile for Profiling Server (PROS)
+PROG=	pros
 SRCS=	main.c
 
 DPADD+=	${LIBSYS}

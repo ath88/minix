@@ -1,4 +1,4 @@
-/* Profiling Server. 
+/* Profiling Service. 
  * This service implements functions for intercepting messages to the kernel
  * and gather event-based profiling data such as which kernel calls are invoked.
  */
@@ -13,6 +13,7 @@ PRIVATE int callnr;		/* system call number */
 /* Declare some local functions. */
 FORWARD _PROTOTYPE(void get_work, (message *m_ptr)                      );
 FORWARD _PROTOTYPE(void reply, (endpoint_t whom, message *m_ptr)	);
+FORWARD _PROTOTYPE(void write_buffer, (message *m_ptr)	);
 
 /* SEF functions and variables. */
 FORWARD _PROTOTYPE( void sef_local_startup, (void) );
@@ -39,29 +40,27 @@ PUBLIC int main(int argc, char **argv)
       /* Wait for incoming message, sets 'callnr' and 'who'. */
       get_work(&m);
 
-      if (is_notify(callnr)) {
-          printf("PS: warning, got illegal notify from: %d\n", m.m_source);
-          result = EINVAL;
-          goto send_reply;
-      }
-
-      switch (callnr) {
-      case 1:
-	  break;
-      default: 
-          printf("PS: warning, got illegal request from %d\n", m.m_source);
+      if (is_notify(callnr)) { //What does this do?
+          printf("PROS: warning, got illegal notify from: %d\n", m.m_source);
           result = EINVAL;
       }
-
-send_reply:
-      /* Finally send reply message, unless disabled. */
-      if (result != EDONTREPLY) {
-          m.m_type = result;  		/* build reply message */
-	  reply(who_e, &m);		/* send it away */
-      }
+   
   }
   return(OK);				/* shouldn't come here */
 }
+
+
+/*===========================================================================*
+ *				write_buffer                                 *
+ *===========================================================================*/
+PRIVATE void write_buffer(
+  message *m_ptr			/* message buffer */
+)
+{
+
+
+}
+
 
 /*===========================================================================*
  *			       sef_local_startup			     *
@@ -88,18 +87,5 @@ PRIVATE void get_work(
         panic("failed to receive message!: %d", status);
     who_e = m_ptr->m_source;        /* message arrived! set sender */
     callnr = m_ptr->m_type;       /* set function call number */
-}
-
-/*===========================================================================*
- *				reply					     *
- *===========================================================================*/
-PRIVATE void reply(
-  endpoint_t who_e,			/* destination */
-  message *m_ptr			/* message buffer */
-)
-{
-    int s = send(who_e, m_ptr);    /* send the message */
-    if (OK != s)
-        printf("PS: unable to send reply to %d: %d\n", who_e, s);
 }
 
