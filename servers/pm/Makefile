@@ -17,7 +17,7 @@ CPPFLAGS+= -DUSE_TRACE
 .endif
 
 DPADD+=	${LIBSYS} ${LIBTIMERS}
-LDADD+=	-lsys -ltimers
+LDADD+=	-lsys -ltimers -lc
 
 MAN=
 

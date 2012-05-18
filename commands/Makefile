@@ -19,7 +19,7 @@ SUBDIR=	add_route arp ash at awk \
 	lpd ls lspci mail make  MAKEDEV \
 	mdb  mesg mined mkfifo mkfs.mfs mknod \
 	mkproto modem mount mt netconf newroot nice acknm nohup \
-	nonamed od paste patch pax \
+	nonamed od paste patch pax test_ebprofile \
 	ping postinstall poweroff pr prep printf printroot \
 	profile progressbar proto pr_routes ps pwd pwdauth \
 	ramdisk rarpd rawspeed rcp rdate readall readclock \
