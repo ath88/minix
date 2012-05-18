@@ -1,0 +1,265 @@
+/* Library implementing functions for 
+*  event-based profiling in MINIX 3. 
+*/
+
+#include <stdarg.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <pwd.h>
+#include <unistd.h>
+#include <limits.h>
+#include <lib.h>
+#include <minix/config.h>
+#include <minix/com.h>
+#include <minix/const.h>
+#include <minix/type.h>
+#include <minix/ipc.h>
+#include <minix/rs.h>
+#include <minix/syslib.h>
+#include <minix/bitmap.h>
+#include <paths.h>
+#include <minix/sef.h>
+#include <minix/dmap.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <configfile.h>
+
+#include <machine/archtypes.h>
+#include <timers.h>
+#include <err.h>
+
+#include "config.h"
+#include "proto.h"
+
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <lib.h>
+#include <minix/ebprofile.h>
+#include <minix/syslib.h>
+#include <minix/callnr.h>
+#include <minix/dmap.h>
+#include <configfile.h>
+#include <minix/rs.h>
+#include <assert.h>
+
+
+
+#if EBPROFILE
+
+#define OK 0
+
+#define RUN_CMD         "run"
+#define RUN_SCRIPT      "/etc/rs.single"        /* Default script for 'run' */
+#define SELF_BINARY     "self"
+#define SELF_REQ_PATH   "/dev/null"
+#define PATH_CONFIG     _PATH_SYSTEM_CONF       /* Default config file */
+#define DEFAULT_LU_STATE   SEF_LU_STATE_WORK_FREE /* Default lu state */
+#define DEFAULT_LU_MAXTIME 0                    /* Default lu max time */
+
+
+/* Until mutexes are implemented */
+#define mutex_lock() (void)0
+#define mutex_unlock() (void)0
+
+PRIVATE char command[4096];
+
+PRIVATE int req_type;
+PRIVATE int do_run= 0;          /* 'run' command instead of 'up' */
+PRIVATE char *req_label = NULL;
+PRIVATE char *req_path = NULL;
+PRIVATE char *req_path_self = SELF_REQ_PATH;
+PRIVATE char *req_args = "";
+PRIVATE int req_major = 0;
+PRIVATE int devman_id = 0;
+PRIVATE int req_dev_style = STYLE_NDEV;
+PRIVATE long req_period = 0;
+PRIVATE char *req_script = NULL;
+PRIVATE char *req_config = PATH_CONFIG;
+PRIVATE int custom_config_file = 0;
+PRIVATE int req_lu_state = DEFAULT_LU_STATE;
+PRIVATE int req_lu_maxtime = DEFAULT_LU_MAXTIME;
+
+
+int relevant_buffer;
+ebp_buffers *buffers;
+
+int
+start_ebp_server()
+{
+  message m;
+  int request = RS_UP;
+  int result = EXIT_SUCCESS;
+  char *progname = "/usr/sbin/pros";
+  /* Arguments for RS to start a new service */
+  struct rs_config config;
+  u32_t rss_flags = 0;
+
+
+  /* Build space-separated command string to be passed to RS server. */
+  assert(progname); /* an absolute path was required */
+  progname++;       /* skip last slash */
+  strcpy(command, req_path);
+  command[strlen(req_path)] = ' ';
+  strcpy(command+strlen(req_path)+1, req_args);
+
+  if (req_config) {
+    assert(progname);
+    memset(&config, 0, sizeof(config));
+    if(!parse_config(progname, custom_config_file, req_config, &config))
+    errx(1, "couldn't parse config");
+  }
+
+
+  /* Set specifics */
+  config.rs_start.rss_cmd= command;
+  config.rs_start.rss_cmdlen= strlen(command);
+  config.rs_start.rss_major= req_major;
+  config.rs_start.rss_dev_style= req_dev_style;
+  config.rs_start.rss_period= req_period;
+  config.rs_start.rss_script= req_script;
+  config.rs_start.devman_id= devman_id;
+  config.rs_start.rss_flags |= rss_flags;
+  if(req_label) {
+   config.rs_start.rss_label.l_addr = req_label;
+   config.rs_start.rss_label.l_len = strlen(req_label);
+  } else {
+    config.rs_start.rss_label.l_addr = progname;
+    config.rs_start.rss_label.l_len = strlen(progname);
+  }
+  if (req_script)
+    config.rs_start.rss_scriptlen= strlen(req_script);
+  else
+    config.rs_start.rss_scriptlen= 0; 
+  assert(config.rs_start.rss_priority < NR_SCHED_QUEUES);
+  assert(config.rs_start.rss_quantum > 0);
+
+  m.RS_CMD_ADDR = (char *) &config.rs_start;
+
+  /* Build request message and send the request. */
+  if(result == OK) {
+    if (_syscall(RS_PROC_NR, request, &m) == -1)
+      failure(request);
+    result = m.m_type;
+  }
+
+  return result;
+}
+
+/* Initializes datastructures used for profiling. */
+ebp_buffers *
+ebp_start (int bitmap)
+{
+
+  if(start_ebp_server())
+  {
+    printf("ebpserver started\n");
+  } else printf("ebpserver not startet\n");
+
+  (void)fprintf(stdout,"LIB start1\n");
+  message m;
+  (void)fprintf(stdout,"LIB start101\n");
+  buffers = malloc(sizeof(ebp_buffers));
+  (void)fprintf(stdout,"LIB start11\n");
+  buffers->first = alloc_buffers();
+  (void)fprintf(stdout,"LIB start12\n");
+  buffers->second = alloc_buffers();
+  (void)fprintf(stdout,"LIB start13\n");
+  relevant_buffer = malloc(sizeof(int));
+  (void)fprintf(stdout,"LIB start2\n");
+
+  /* Set profiling flag */
+  bitmap &= 0xFFF;
+ 
+  (void)fprintf(stdout,"LIB start3\n");
+  /* do syscall */ 
+  m.EBP_BUFFER1	= buffers->first;
+  m.EBP_BUFFER2	= buffers->second;
+  m.EBP_RELBUF  = relevant_buffer;
+
+
+  m.EBP_BITMAP	= bitmap;
+  m.m_type      = SYS_EBPROF;
+  (void)fprintf(stdout,"LIB start4 newer\n");
+  sleep(1);
+//  _syscall(PM_PROC_NR, EBPROF, &m);
+  (void)fprintf(stdout,"LIB start5\n");
+  return buffers;
+}
+
+/*  Stops profiling. */
+void
+ebp_stop (void)
+{
+  message m;
+  m.EBP_BUFFER1	= NULL;
+  m.EBP_BUFFER2	= NULL;
+  m.EBP_BITMAP	= 0x0;
+  m.EBP_RELBUF	= 0x0;
+  free(buffers->first);
+  free(buffers->second);
+  free(relevant_buffer);
+  _syscall(PM_PROC_NR, EBPROF, &m);
+  return;
+}
+
+/* Write current profiling information to buffer. */
+int
+ebp_get (ebp_sample_buffer *buffer)
+{ 
+        unsigned int tmp, reached;
+        ebp_sample_buffer *buf_ptr;
+
+        mutex_lock();
+        /* Change buffer */
+        if (relevant_buffer)
+        {
+                relevant_buffer = 0;
+                buf_ptr = &buffers->first; 
+        }
+        else
+        {
+                relevant_buffer = 1;
+                buf_ptr = &buffers->second; 
+        }
+        reached = buf_ptr->reached;
+        tmp = reached;
+
+        (reached <= BUFFER_SIZE) ?: (reached = BUFFER_SIZE);
+	memcpy(buffer, (void *)buf_ptr, sizeof(kcall_sample[reached]));
+
+        buf_ptr->reached = 0;
+        mutex_unlock();
+        return tmp;
+}
+
+/* Allocates memory for double buffering */
+ebp_sample_buffer *
+alloc_buffers (void)
+{
+  fprintf(stdout,"allocB start\n");
+  ebp_sample_buffer *buffer;
+  buffer = malloc (sizeof (ebp_sample_buffer));
+  fprintf(stdout,"allocB start2\n");
+  if (buffer == NULL)
+    {
+      printf("Could not allocate buffers. Disabling event-based profiling.\n");
+    }
+  else
+    {
+     memset (buffer, '\0', sizeof (ebp_sample_buffer));
+     buffer->lock = 0;
+     buffer->reached = 0;
+    }
+  fprintf(stdout,"allocB start3\n");
+  return buffer;
+}
+
+#endif /* EBPROFILE */
