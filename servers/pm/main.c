@@ -52,7 +52,7 @@ FORWARD _PROTOTYPE( int sef_cb_init_fresh, (int type, sef_init_info_t *info) );
 FORWARD _PROTOTYPE( int sef_cb_signal_manager, (endpoint_t target, int signo) );
 
 #if EBPROFILE
-EXTERN endpoint_t pros_proc_nr;
+endpoint_t pros_proc_nr;
 #endif
 
 /*===========================================================================*
@@ -156,7 +156,7 @@ PUBLIC int main()
 	if (result != SUSPEND) setreply(who_p, result);
 	sendreply();
        
-#if EBPROFILE
+#if EBPROFILExx
         /* If pros process number is not cached, look it up */
         if (!pros_proc_nr)
         {
@@ -168,10 +168,10 @@ PUBLIC int main()
            m_out->RS_NAME = name;
            send(RS_PROC_NR, m_out);
            // Receive message
-           pros_proc_nr = ;
+           pros_proc_nr = 0;
         }
         /* Send message to pros */ 
-        asynsend(pros_proc_nr, m_in);
+        asynsend(pros_proc_nr, &m_in);
 #endif
   }
   return(OK);

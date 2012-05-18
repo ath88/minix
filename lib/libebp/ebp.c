@@ -164,11 +164,18 @@ start_ebp_server()
 ebp_buffers *
 ebp_start (int bitmap)
 {
+  endpoint_t endpoint;
 
-  if(start_ebp_server())
+  if(start_ebp_server() == OK)
   {
     printf("ebpserver started\n");
   } else printf("ebpserver not startet\n");
+
+  printf("ebpserver pid addr = %x\n",&endpoint);
+  minix_rs_lookup("pros",&endpoint);
+
+  printf("ebpserver pid addr = %x\n",&endpoint);
+  printf("ebpserver pid = %d\n",endpoint);
 
   (void)fprintf(stdout,"LIB start1\n");
   message m;
@@ -194,7 +201,7 @@ ebp_start (int bitmap)
 
   (void)fprintf(stdout,"LIB start4 newer\n");
   sleep(1);
-//  _syscall(PM_PROC_NR, EBPROF, &m);
+  _syscall(endpoint, PROS_CTL, &m);
   (void)fprintf(stdout,"LIB start5\n");
   return buffers;
 }

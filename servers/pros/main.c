@@ -82,6 +82,7 @@ PRIVATE void get_work(
   message *m_ptr			/* message buffer */
 )
 {
+    printf("waiting for new message!\n"); 
     int status = sef_receive(ANY, m_ptr);   /* blocks until message arrives */
     if (OK != status)
         panic("failed to receive message!: %d", status);

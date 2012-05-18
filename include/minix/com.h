@@ -1266,7 +1266,7 @@
 
 #define PROS_BASE       0x1500 
 
-#define PROS_START	(PROS_BASE + 0)	/* control profiling */
+#define PROS_CTL	(PROS_BASE + 0)	/* control profiling */
 
 #define PROS_BUFFER1	m7_i1	
 #define PROS_BUFFER2	m7_i2	
