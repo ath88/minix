@@ -50,6 +50,7 @@
 #include <minix/rs.h>
 #include <assert.h>
 
+#include <sys/ipc.h>
 
 
 #if EBPROFILE
@@ -89,7 +90,6 @@ PRIVATE int req_lu_maxtime = DEFAULT_LU_MAXTIME;
 
 PRIVATE void failure(int request);
 
-int relevant_buffer;
 ebp_buffers *buffers;
 
 int
@@ -164,12 +164,13 @@ start_ebp_server()
 ebp_buffers *
 ebp_start (int bitmap)
 {
-  unsigned int *shmkey1, *shmkey2;
+  unsigned int shmkey1, shmkey2, shmkey3;
   endpoint_t endpoint;
 
   /* Generate keys for shared memory */
-  *shmkey1 = 0x1234;
-  *shmkey2 = 0x5678;
+  shmkey1 = 0x1234;
+  shmkey2 = 0x5678;
+  shmkey3 = 0x1945;
 
   if(start_ebp_server() == OK)
   {
@@ -194,8 +195,16 @@ ebp_start (int bitmap)
   (void)fprintf(stdout,"LIB start12\n");
   buffers->second = alloc_buffers(shmkey2);
 
+  int shmid;
   (void)fprintf(stdout,"LIB start13\n");
-  relevant_buffer = malloc(sizeof(int));
+  if ((shmid = shmget(shmkey3, sizeof (int), IPC_CREAT | 0666)) < 0) {
+           printf("Could not allocate shared memory. Disabling event-based profiling.\n");
+           return ENOMEM;
+  }
+  if ((buffers->relbuf = shmat(shmid, NULL, 0)) == (char *) -1) {
+    perror("shmat");
+    exit(1);
+  }
   (void)fprintf(stdout,"LIB start2\n");
 
   /* Set profiling flag */
@@ -205,9 +214,8 @@ ebp_start (int bitmap)
   /* do syscall */ 
   m.PROS_BUFFER1	= shmkey1;
   m.PROS_BUFFER2	= shmkey2;
-  m.PROS_RELBUF         = relevant_buffer;
+  m.PROS_RELBUF         = shmkey3;
   m.PROS_BITMAP	        = bitmap;
-
   (void)fprintf(stdout,"LIB start4 newer\n");
   sleep(1);
   _syscall(endpoint, PROS_CTL, &m);
@@ -226,7 +234,7 @@ ebp_stop (void)
   m.PROS_RELBUF		= 0x0;
   free(buffers->first);
   free(buffers->second);
-  free(relevant_buffer);
+  free(buffers->relbuf);
 //  _syscall(PM_PROC_NR, EBPROF, &m);
   return;
 }
@@ -240,14 +248,14 @@ ebp_get (ebp_buffers *buffer)
 
         mutex_lock();
         /* Change buffer */
-        if (relevant_buffer)
+        if (buffers->relbuf)
         {
-                relevant_buffer = 0;
+                buffers->relbuf = 0;
                 buf_ptr = &buffers->first; 
         }
         else
         {
-                relevant_buffer = 1;
+                buffers->relbuf = 1;
                 buf_ptr = &buffers->second; 
         }
         reached = buf_ptr->reached;
