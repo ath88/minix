@@ -47,6 +47,7 @@ typedef struct
 {
   ebp_sample_buffer *first;
   ebp_sample_buffer *second;
+  unsigned int *relbuf;
 } ebp_buffers;
 
 /* userland functions */

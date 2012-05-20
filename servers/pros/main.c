@@ -54,10 +54,10 @@ PUBLIC int main(int argc, char **argv)
               case PROS_CTL:
                  //Send reply
                  result = do_ctl(&m);
-                 reply(who_p, &m);
+                 reply(who_e, &m);
               default:
                  write_buffer(&m);
-                 reply(who_p, &m);
+                 reply(who_e, &m);
                 break;
       }
   }
@@ -71,7 +71,7 @@ void write_buffer(
   message *m_ptr			/* message buffer */
 )
 {
-
+  printf("Message recieved, type: %d\n",m_ptr->m_type);
 
 }
 

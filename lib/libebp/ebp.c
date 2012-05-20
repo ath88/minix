@@ -89,7 +89,6 @@ PRIVATE int req_lu_maxtime = DEFAULT_LU_MAXTIME;
 
 PRIVATE void failure(int request);
 
-int relevant_buffer;
 ebp_buffers *buffers;
 
 int
@@ -186,7 +185,7 @@ ebp_start (int bitmap)
   (void)fprintf(stdout,"LIB start12\n");
   buffers->second = alloc_buffers();
   (void)fprintf(stdout,"LIB start13\n");
-  relevant_buffer = malloc(sizeof(int));
+  buffers->relbuf = malloc(sizeof(int));
   (void)fprintf(stdout,"LIB start2\n");
 
   /* Set profiling flag */
@@ -196,7 +195,7 @@ ebp_start (int bitmap)
   /* do syscall */ 
   m.PROS_BUFFER1	= buffers->first;
   m.PROS_BUFFER2	= buffers->second;
-  m.PROS_RELBUF  = relevant_buffer;
+  m.PROS_RELBUF  =        buffers->relbuf;
   m.PROS_BITMAP	= bitmap;
 
   (void)fprintf(stdout,"LIB start4 newer\n");
@@ -217,7 +216,7 @@ ebp_stop (void)
   m.PROS_RELBUF		= 0x0;
   free(buffers->first);
   free(buffers->second);
-  free(relevant_buffer);
+  free(buffers->relbuf);
 //  _syscall(PM_PROC_NR, EBPROF, &m);
   return;
 }
@@ -231,14 +230,14 @@ ebp_get (ebp_sample_buffer *buffer)
 
         mutex_lock();
         /* Change buffer */
-        if (relevant_buffer)
+        if (buffers->relbuf)
         {
-                relevant_buffer = 0;
+                buffers->relbuf = 0;
                 buf_ptr = &buffers->first; 
         }
         else
         {
-                relevant_buffer = 1;
+                buffers->relbuf = 1;
                 buf_ptr = &buffers->second; 
         }
         reached = buf_ptr->reached;
