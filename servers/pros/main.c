@@ -58,6 +58,7 @@ PUBLIC int main(int argc, char **argv)
       {
               case PROS_CTL:
                  //Send reply
+                 printf("got ctl message\n");
                  result = do_ctl(&m);
                  reply(who_e, &m);
                  break;
@@ -78,6 +79,7 @@ void write_buffer(
 )
 {
   printf("Message recieved, type: %d\n",m_ptr->m_type);
+  printf("ctl msessage: %d\n",PROS_CTL);
 
 }
 

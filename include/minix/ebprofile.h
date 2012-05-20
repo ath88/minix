@@ -53,7 +53,7 @@ typedef struct
 /* userland functions */
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
-int ebp_get (ebp_sample_buffer *buffer);
+int ebp_get (ebp_buffers *buffer);
 ebp_sample_buffer *alloc_buffers (key_t key);
 int buffer_switched (void);
 
