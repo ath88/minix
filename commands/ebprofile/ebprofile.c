@@ -2,8 +2,6 @@
  * in MINIX 3. 
  */
 
-// Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
-
 #include <minix/ebprofile.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,8 +61,6 @@ start ()
   j = 0;
 
   /* NEW FILE OR SOCKET MAGIC */
-
-  printf("3\n");
   while (1)
   {
 	j++;
@@ -84,7 +80,6 @@ start ()
 //     	//printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
 //	}
   }
-  printf("4\n");
   return 0;
 }
 

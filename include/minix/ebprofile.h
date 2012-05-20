@@ -10,7 +10,7 @@
 #include <minix/com.h>
 #include <minix/priv.h>
 #include <minix/const.h>
-
+#include <sys/types.h>
 
 #define HELP  0
 #define START 1
@@ -54,7 +54,7 @@ typedef struct
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (ebp_sample_buffer *buffer);
-ebp_sample_buffer *alloc_buffers (void);
+ebp_sample_buffer *alloc_buffers (key_t key);
 int buffer_switched (void);
 
 #endif /* _TOOL_EBPROF_H */
