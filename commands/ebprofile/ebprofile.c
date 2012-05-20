@@ -70,7 +70,9 @@ start ()
         } else *buffers->relbuf = 1;
 
 
-       	printf("m_type = %d\n", buffers->first->reached);
+       	printf("first reached = %d\n", buffers->first->reached);
+       	printf("second reached = %d\n", buffers->second->reached);
+
 	sleep(1);
 //	if (!ebp_get(consumer_buffer))
 //		continue;

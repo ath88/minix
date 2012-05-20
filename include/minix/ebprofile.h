@@ -25,7 +25,7 @@
 typedef struct
 {
   int time;
-  int kcall;
+  int type;
   unsigned int p_nr;
   endpoint_t p_endpoint;
   int *params[12];
