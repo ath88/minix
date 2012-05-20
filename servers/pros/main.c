@@ -7,6 +7,7 @@
 #include "glo.h"
 #include <minix/endpoint.h>
 #include <sys/shm.h>
+#include <sys/ipc.h>
 
 /* Allocate space for the global variables. */
 endpoint_t who_e, who_p;	/* caller's proc number */
@@ -38,6 +39,10 @@ PUBLIC int main(int argc, char **argv)
  */
   message m;
   int result;                 
+  
+  shmid1 = 0;
+  shmid2 = 0;
+  shmid3 = 0;
 
   /* SEF local startup. */
   env_setargs(argc, argv);
@@ -135,11 +140,11 @@ int attach_memory(
 {
     int new_shmid1, new_shmid2, new_shmid3;
     /* get shared memory ids */
-    if ((new_shmid1 = shmget(key1, IPC_CREAT, 0666)) < 0)
+    if ((new_shmid1 = shmget(key1, sizeof(ebp_sample_buffer), 0666)) < 0)
         return ENOMEM;
-    if ((new_shmid2 = shmget(key2, IPC_CREAT, 0666)) < 0)
+    if ((new_shmid2 = shmget(key2, sizeof(ebp_sample_buffer), 0666)) < 0)
         return ENOMEM;
-    if ((new_shmid3 = shmget(key3, IPC_CREAT, 0666)) < 0)
+    if ((new_shmid3 = shmget(key3, sizeof(ebp_sample_buffer), 0666)) < 0)
         return ENOMEM;
     
     /* are we trying to allocate new profiling buffers? */
