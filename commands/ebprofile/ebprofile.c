@@ -2,8 +2,6 @@
  * in MINIX 3. 
  */
 
-// Remember to handle SIGKILL, clean up and tell kernel to stop profiling etc
-
 #include <minix/ebprofile.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,27 +50,14 @@ start ()
 {
   printf("Starting..\n");
   ebp_buffers *buffers;
-  ebp_sample_buffer *consumer_buffer = (ebp_sample_buffer *) malloc(sizeof(kcall_sample[BUFFER_SIZE]));
-  if (consumer_buffer == NULL) 
-  {
-    printf("malloc failed");
-    return 1;
-  }
-  printf("1\n");
 
-  /* Allocates buffers and start profiling */
-  //buffers = ebp_start(0xFFF); // test bitmap, profiles everything
   ebp_start(0xFFF); // test bitmap, profiles everything
-
-  printf("2\n");
 
   /* Loop consumer, read buffers and write to file or socket */
   int i, j;
   j = 0;
 
   /* NEW FILE OR SOCKET MAGIC */
-
-  printf("3\n");
   while (1)
   {
 	j++;
@@ -83,10 +68,9 @@ start ()
 	for (i=0; i<= BUFFER_SIZE; i++)
 	{
             /* Here we would write to a file or a socket or stdout */
-       	//printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
+            printf("\n");
 	}
   }
-  printf("4\n");
   return 0;
 }
 

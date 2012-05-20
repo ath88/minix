@@ -164,7 +164,12 @@ start_ebp_server()
 ebp_buffers *
 ebp_start (int bitmap)
 {
+  unsigned int *shmkey1, *shmkey2;
   endpoint_t endpoint;
+
+  /* Generate keys for shared memory */
+  *shmkey1 = 0x1234;
+  *shmkey2 = 0x5678;
 
   if(start_ebp_server() == OK)
   {
@@ -179,12 +184,16 @@ ebp_start (int bitmap)
 
   (void)fprintf(stdout,"LIB start1\n");
   message m;
+
   (void)fprintf(stdout,"LIB start101\n");
   buffers = malloc(sizeof(ebp_buffers));
+
   (void)fprintf(stdout,"LIB start11\n");
-  buffers->first = alloc_buffers();
+  buffers->first = alloc_buffers(shmkey1);
+
   (void)fprintf(stdout,"LIB start12\n");
-  buffers->second = alloc_buffers();
+  buffers->second = alloc_buffers(shmkey2);
+
   (void)fprintf(stdout,"LIB start13\n");
   relevant_buffer = malloc(sizeof(int));
   (void)fprintf(stdout,"LIB start2\n");
@@ -194,10 +203,10 @@ ebp_start (int bitmap)
  
   (void)fprintf(stdout,"LIB start3\n");
   /* do syscall */ 
-  m.PROS_BUFFER1	= buffers->first;
-  m.PROS_BUFFER2	= buffers->second;
-  m.PROS_RELBUF  = relevant_buffer;
-  m.PROS_BITMAP	= bitmap;
+  m.PROS_BUFFER1	= shmkey1;
+  m.PROS_BUFFER2	= shmkey2;
+  m.PROS_RELBUF         = relevant_buffer;
+  m.PROS_BITMAP	        = bitmap;
 
   (void)fprintf(stdout,"LIB start4 newer\n");
   sleep(1);
@@ -224,7 +233,7 @@ ebp_stop (void)
 
 /* Write current profiling information to buffer. */
 int
-ebp_get (ebp_sample_buffer *buffer)
+ebp_get (ebp_buffers *buffer)
 { 
         unsigned int tmp, reached;
         ebp_sample_buffer *buf_ptr;
@@ -254,24 +263,21 @@ ebp_get (ebp_sample_buffer *buffer)
 
 /* Allocates memory for double buffering */
 ebp_sample_buffer *
-alloc_buffers (void)
+alloc_buffers (key_t key)
 {
   fprintf(stdout,"allocB start\n");
-  ebp_sample_buffer *buffer;
-  buffer = malloc (sizeof (ebp_sample_buffer));
-  fprintf(stdout,"allocB start2\n");
-  if (buffer == NULL)
-    {
-      printf("Could not allocate buffers. Disabling event-based profiling.\n");
-    }
-  else
-    {
-     memset (buffer, '\0', sizeof (ebp_sample_buffer));
-     buffer->lock = 0;
-     buffer->reached = 0;
-    }
-  fprintf(stdout,"allocB start3\n");
-  return buffer;
+  int shmid;
+  char *buffer;
+
+  if ((shmid = shmget(key, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) {
+           printf("Could not allocate shared memory. Disabling event-based profiling.\n");
+           return ENOMEM;
+  }
+  if ((buffer = shmat(shmid, NULL, 0)) == (char *)-1) {
+           printf("Could not attach shared memory. Disabling event-based profiling.\n");
+           return ENOMEM;
+  }
+  return (ebp_sample_buffer *)buffer;
 }
 
 /* A request to the RS server failed. Report and exit. 
