@@ -79,7 +79,21 @@ void write_buffer(
 )
 {
   printf("Message recieved, type: %d\n",m_ptr->m_type);
-  printf("ctl msessage: %d\n",PROS_CTL);
+  printf("relbuf is now = %d\n",*relbuf);
+  if (*relbuf == 1) 
+  {
+    first->sample[first->reached].type = m_ptr->m_type;
+    first->sample[first->reached].p_nr = m_ptr->m_source;
+    first->sample[first->reached].p_endpoint = who_e;
+    first->reached++; 
+  } 
+  else 
+  {
+    second->sample[second->reached].type = m_ptr->m_type;
+    second->sample[second->reached].p_nr = m_ptr->m_source;
+    second->sample[second->reached].p_endpoint = who_e;
+    second->reached++; 
+  }
 
 }
 
@@ -142,27 +156,33 @@ int attach_memory(
 {
     int new_shmid1, new_shmid2, new_shmid3;
     /* get shared memory ids */
+    printf("key for buf1 = %d, buf2 = %d, relbuf = %d\n",key1,key2,key3);
     if ((new_shmid1 = shmget(key1, sizeof(ebp_sample_buffer), 0666)) < 0)
         return ENOMEM;
     if ((new_shmid2 = shmget(key2, sizeof(ebp_sample_buffer), 0666)) < 0)
         return ENOMEM;
-    if ((new_shmid3 = shmget(key3, sizeof(ebp_sample_buffer), 0666)) < 0)
+    if ((new_shmid3 = shmget(key3, sizeof(int), 0666)) < 0)
         return ENOMEM;
+    printf("shmid for buf1 = %d, buf2 = %d, relbuf = %d\n",new_shmid1, new_shmid2, new_shmid3);
     
     /* are we trying to allocate new profiling buffers? */
-    if (new_shmid1 == shmid1 && new_shmid2 == shmid2 && new_shmid3 == shmid3)
-        return OK;
+//    if (new_shmid1 == shmid1 && new_shmid2 == shmid2 && new_shmid3 == shmid3)
+//        return OK;
 
     /* attach shared memory */
-    if ((first = shmat(shmid1, NULL, 0)) == (char *) -1) {
+    if ((first = shmat(new_shmid1, NULL, 0)) == (char *) -1) {
         return ENOMEM;
     }
-    if ((second = shmat(shmid2, NULL, 0)) == (char *) -1) {
+    if ((second = shmat(new_shmid2, NULL, 0)) == (char *) -1) {
         return ENOMEM;
     }
-    if ((relbuf = shmat(shmid3, NULL, 0)) == (char *) -1) {
+    printf("trying to attach\n");
+    if ((relbuf = shmat(new_shmid3, NULL, 0)) == (char *) -1) {
         return ENOMEM;
     }
+    printf("attached buf1, addr = 0x%x, val = %d\n", first, *first);
+    printf("attached buf2, addr = 0x%x, val = %d\n", second, *second);
+    printf("attached relbuf, addr = 0x%x, val = %d\n", relbuf, *relbuf);
     return OK;
 }
 
