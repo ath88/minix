@@ -7,6 +7,7 @@
 #include "glo.h"
 #include <minix/endpoint.h>
 #include <sys/shm.h>
+#include <sys/ipc.h>
 
 /* Allocate space for the global variables. */
 endpoint_t who_e, who_p;	/* caller's proc number */
