@@ -34,7 +34,7 @@ main(int argc, char *argv[])
 
     if (pros_proc_nr != 0) 
     {
-      send(pros_proc_nr, &m);
+      sendrec(pros_proc_nr, &m);
       printf("message sent\n");
     }
 
