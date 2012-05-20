@@ -61,7 +61,7 @@ PUBLIC int main(int argc, char **argv)
                  printf("got ctl message\n");
                  if((result = do_ctl(&m)) != OK)
                         return result;
-                 reply(who_p, &m);
+                 reply(who_e, &m);
                  break;
               default:
                  write_buffer(&m);
@@ -79,7 +79,7 @@ void write_buffer(
   message *m_ptr			/* message buffer */
 )
 {
-  printf("Message recieved, type: %d\n",m_ptr->m_type);
+  printf("Message recieved, type: %d, source: %d, who_e: %d\n",m_ptr->m_type, m_ptr->m_source, who_e);
   printf("relbuf is now = %d\n",*relbuf);
   if (*relbuf == 1) 
   {

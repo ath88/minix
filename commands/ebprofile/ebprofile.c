@@ -67,7 +67,12 @@ start ()
 	if(*buffers->relbuf == 1)
 	{
           *buffers->relbuf = 0; 
-        } else *buffers->relbuf = 1;
+           buffers->first->reached = 0;
+        } else 
+        {
+          *buffers->relbuf = 1;
+          buffers->second->reached = 0;
+        } 
 
 
        	printf("first reached = %d\n", buffers->first->reached);
