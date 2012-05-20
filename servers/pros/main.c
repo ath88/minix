@@ -11,7 +11,7 @@
 
 /* Allocate space for the global variables. */
 endpoint_t who_e, who_p;	/* caller's proc number */
-int callnr;		/* system call number */
+int callnr;		        /* system call number */
 int bitmap;
 ebp_sample_buffer *first;
 ebp_sample_buffer *second;
@@ -59,8 +59,9 @@ PUBLIC int main(int argc, char **argv)
               case PROS_CTL:
                  //Send reply
                  printf("got ctl message\n");
-                 result = do_ctl(&m);
-                 reply(who_e, &m);
+                 if((result = do_ctl(&m)) != OK)
+                        return result;
+                 reply(who_p, &m);
                  break;
               default:
                  write_buffer(&m);
@@ -198,4 +199,3 @@ message *m_ptr                        /* message buffer */
   if (OK != s)
     printf("PROS: unable to send reply to %d: %d\n", who_e, s);
 }
-
