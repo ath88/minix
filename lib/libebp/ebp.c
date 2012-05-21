@@ -165,17 +165,23 @@ ebp_buffers *
 ebp_start (int bitmap)
 {
   unsigned int shmkey1, shmkey2, shmkey3;
-  endpoint_t endpoint;
+  endpoint_t endpoint = 0;
 
   /* Generate keys for shared memory */
   shmkey1 = 0x1234;
   shmkey2 = 0x5678;
   shmkey3 = 0x1945;
 
-  if(start_ebp_server() == OK)
+  minix_rs_lookup("pros",&endpoint);
+  printf("server is at; %d",endpoint);
+  if (endpoint == 0) 
   {
-    printf("ebpserver started\n");
-  } else printf("ebpserver not startet\n");
+
+    if(start_ebp_server() == OK)
+    {
+      printf("ebpserver started\n");
+    } else printf("ebpserver not startet\n");
+  }
 
   printf("ebpserver pid addr = %x\n",&endpoint);
   minix_rs_lookup("pros",&endpoint);
