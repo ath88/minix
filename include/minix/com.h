@@ -1267,11 +1267,17 @@
 #define PROS_BASE       0x1600 
 
 #define PROS_CTL	(PROS_BASE + 0)	/* control profiling */
+#define PROS_PROBE	(PROS_BASE + 1)	/* fire probe for profiling */
 
+/* Field names for controlling profiling */
 #define PROS_BUFFER1	m7_i1	
 #define PROS_BUFFER2	m7_i2	
 #define PROS_RELBUF	m7_i3	
 #define PROS_BITMAP	m7_i4	
+
+/* Field names for probe */
+#define PROS_TYPE 	m7_i1
+#define PROS_PAYLOAD 	m7_i2
 
 
 /* _MINIX_COM_H */

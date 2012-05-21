@@ -13,31 +13,12 @@
 int
 main(int argc, char *argv[])
 {
-
-  endpoint_t pros_proc_nr = 0;
-  message m;
-
-  m.m_type = 1337;
-
   printf("starting test-probes\n");
   while(1) 
   {
     printf("trying\n");
 
-    if (pros_proc_nr == 0)
-    {
-      printf("pros server not found, looking up!\n");
-      minix_rs_lookup("pros", &pros_proc_nr);
-      if (pros_proc_nr != 0) 
-        printf("pros server found, pid = %d\n",pros_proc_nr);
-    }
-
-    if (pros_proc_nr != 0) 
-    {
-      sendrec(pros_proc_nr, &m);
-      printf("message sent\n");
-    }
-
-    sleep(5);
+    probe(1,1);
+    probe(1,2);
   }
 }  

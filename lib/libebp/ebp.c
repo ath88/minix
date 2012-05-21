@@ -241,30 +241,31 @@ ebp_stop (void)
 
 /* Write current profiling information to buffer. */
 int
-ebp_get (ebp_buffers *buffer)
+ebp_get (ebp_sample_buffer *buffer)
 { 
         unsigned int tmp, reached;
         ebp_sample_buffer *buf_ptr;
 
         mutex_lock();
-        /* Change buffer */
-        if (buffers->relbuf)
+        if (*buffers->relbuf == 1)
         {
-                buffers->relbuf = 0;
-                buf_ptr = &buffers->first; 
+                *buffers->relbuf = 0;
+                buf_ptr = buffers->first; 
         }
         else
         {
-                buffers->relbuf = 1;
-                buf_ptr = &buffers->second; 
+                *buffers->relbuf = 1;
+                buf_ptr = buffers->second; 
         }
         reached = buf_ptr->reached;
+        buf_ptr->reached = 0;
         tmp = reached;
 
-        (reached <= BUFFER_SIZE) ?: (reached = BUFFER_SIZE);
-	memcpy(buffer, (void *)buf_ptr, sizeof(kcall_sample[reached]));
+        if (reached > BUFFER_SIZE)
+          reached = BUFFER_SIZE;
 
-        buf_ptr->reached = 0;
+	memcpy(buffer, (void *)buf_ptr->sample, sizeof(kcall_sample[reached]));
+
         mutex_unlock();
         return tmp;
 }
@@ -287,6 +288,27 @@ alloc_buffers (key_t key)
   }
   return (ebp_sample_buffer *)buffer;
 }
+
+void
+probe (int type, int payload)
+{
+  int pros_proc_nr = 0;
+  message m;
+  m.m_type = PROS_PROBE;
+  m.PROS_TYPE = type;
+  m.PROS_PAYLOAD = payload;
+
+  minix_rs_lookup("pros", &pros_proc_nr);
+  if (pros_proc_nr != 0) 
+  {
+//    printf("pros server found, pid = %d\n",pros_proc_nr);
+    sendrec(pros_proc_nr, &m);
+//    printf("message sent\n");
+  } else printf("pros server not found, cant fire probe\n");
+
+  return;
+}
+
 
 /* A request to the RS server failed. Report and exit. 
  */

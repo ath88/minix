@@ -63,9 +63,14 @@ PUBLIC int main(int argc, char **argv)
                         return result;
                  reply(who_e, &m);
                  break;
-              default:
-                 write_buffer(&m);
+              case PROS_PROBE:
                  reply(who_e, &m);
+                 printf("probe recived, type = '%d', payload = '%d'\n",m.PROS_TYPE,m.PROS_PAYLOAD);
+                 write_buffer(&m);
+                 break;
+              default:
+                 reply(who_e, &m);
+                 write_buffer(&m);
                 break;
       }
   }
@@ -83,16 +88,18 @@ void write_buffer(
   printf("relbuf is now = %d\n",*relbuf);
   if (*relbuf == 1) 
   {
-    first->sample[first->reached].type = m_ptr->m_type;
-    first->sample[first->reached].p_nr = m_ptr->m_source;
-    first->sample[first->reached].p_endpoint = who_e;
+    first->sample[first->reached].m_type = m_ptr->m_type;
+    first->sample[first->reached].m_source = m_ptr->m_source;
+    first->sample[first->reached].field = m_ptr->PROS_TYPE;
+    first->sample[first->reached].payload = m_ptr->PROS_PAYLOAD;
     first->reached++; 
   } 
   else 
   {
-    second->sample[second->reached].type = m_ptr->m_type;
-    second->sample[second->reached].p_nr = m_ptr->m_source;
-    second->sample[second->reached].p_endpoint = who_e;
+    second->sample[second->reached].m_type = m_ptr->m_type;
+    second->sample[second->reached].m_source = m_ptr->m_source;
+    second->sample[second->reached].field = m_ptr->PROS_TYPE;
+    second->sample[second->reached].payload = m_ptr->PROS_PAYLOAD;
     second->reached++; 
   }
 
