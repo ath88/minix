@@ -10,7 +10,7 @@
 #include <sys/ipc.h>
 
 /* Allocate space for the global variables. */
-endpoint_t who_e, who_p;	/* caller's proc number */
+endpoint_t who_e;	/* caller's proc number */
 int callnr;		        /* system call number */
 int bitmap;
 ebp_sample_buffer *first;
