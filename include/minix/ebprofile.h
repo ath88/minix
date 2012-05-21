@@ -25,10 +25,12 @@
 typedef struct
 {
   int time;
-  int type;
-  unsigned int p_nr;
-  endpoint_t p_endpoint;
-  int *params[12];
+  int m_type;
+  unsigned int m_source;
+  endpoint_t m_destination;
+  int field; 
+  int payload; 
+
   /* from kernel/proc.c */
   unsigned cpu;
   char p_priority;
@@ -53,8 +55,8 @@ typedef struct
 /* userland functions */
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
-int ebp_get (ebp_buffers *buffer);
+int ebp_get (ebp_sample_buffer *buffer);
 ebp_sample_buffer *alloc_buffers (key_t key);
-int buffer_switched (void);
+void probe(int type, int payload);
 
 #endif /* _TOOL_EBPROF_H */

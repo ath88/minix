@@ -48,44 +48,37 @@ main (int argc, char *argv[])
 int
 start ()
 {
-  printf("Starting..\n");
   ebp_buffers *buffers;
+  ebp_sample_buffer consumer_buffer;
+  int reached;
 
+  printf("Starting..\n");
   /* Allocates buffers and start profiling */
   buffers = ebp_start(0xFFF); // test bitmap, profiles everything
 
   printf("buffers allocated, buffer1 = 0x%x, buffer2 = 0x%x relbuf = 0x%x2\n",buffers->first,buffers->second,buffers->relbuf);
 
   /* Loop consumer, read buffers and write to file or socket */
-  int i, j;
-  j = 0;
+  int i;
 
   /* NEW FILE OR SOCKET MAGIC */
   while (1)
   {
-	j++;
-	if(*buffers->relbuf == 1)
+ //      	printf("first reached = %d\n", buffers->first->reached);
+  //     	printf("second reached = %d\n", buffers->second->reached);
+
+	reached = ebp_get(&consumer_buffer);
+        if (reached == 0) continue;
+
+	for (i=0; i< reached; i++)
 	{
-          *buffers->relbuf = 0; 
-           buffers->first->reached = 0;
-        } else 
-        {
-          *buffers->relbuf = 1;
-          buffers->second->reached = 0;
-        } 
+           /* Here we would write to a file or a socket or stdout */
+     	printf("m_type = %d, field = %d, payload = %d\n", 
+     	  ((consumer_buffer.sample)[i]).m_type,
+     	  ((consumer_buffer.sample)[i]).field,
+     	  ((consumer_buffer.sample)[i]).payload);
 
-
-       	printf("first reached = %d\n", buffers->first->reached);
-       	printf("second reached = %d\n", buffers->second->reached);
-
-	sleep(1);
-//	if (!ebp_get(consumer_buffer))
-//		continue;
-//	for (i=0; i<= BUFFER_SIZE; i++)
-//	{
-//           /* Here we would write to a file or a socket or stdout */
-//     	//printf("m_type = %d, kcall = %d, p_nr = %d\n", ((kcall_sample *)consumer_buffer)[i]);
-//	}
+	}
   }
   return 0;
 }
