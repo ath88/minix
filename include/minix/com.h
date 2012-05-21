@@ -762,6 +762,7 @@
 #define PM_UNPAUSE_REPLY	(PM_RS_BASE + 9)
 #define PM_REBOOT_REPLY	(PM_RS_BASE + 10)
 #define PM_SETGROUPS_REPLY	(PM_RS_BASE + 11)
+#define PM_PROS_CTL	(PM_RS_BASE + 12)
 
 /* Standard parameters for all requests and replies, except PM_REBOOT */
 #  define PM_PROC		m7_i1	/* process endpoint */
