@@ -52,11 +52,6 @@ FORWARD _PROTOTYPE( void sef_local_startup, (void) );
 FORWARD _PROTOTYPE( int sef_cb_init_fresh, (int type, sef_init_info_t *info) );
 FORWARD _PROTOTYPE( int sef_cb_signal_manager, (endpoint_t target, int signo) );
 
-#if EBPROFILE
-endpoint_t pros_proc_nr = 0;   /* process number of PROS */
-int ebprofiling         = 0;   /* event-based profiling flag */
-#endif
-
 /*===========================================================================*
  *				main					     *
  *===========================================================================*/
@@ -69,6 +64,7 @@ PUBLIC int main()
   sef_local_startup();
 
   pros_proc_nr = 0;
+  ebprofiling = 0;
   
   /* This is PM's main loop-  get work and do it, forever and forever. */
   while (TRUE) {
@@ -115,7 +111,10 @@ PUBLIC int main()
 
 	switch(call_nr)
 	{
-	case PM_SETUID_REPLY:
+        case PM_PROS_CTL:
+                handle_ebpctl();
+                break;
+        case PM_SETUID_REPLY:
 	case PM_SETGID_REPLY:
 	case PM_SETSID_REPLY:
 	case PM_EXEC_REPLY:
@@ -147,28 +146,16 @@ PUBLIC int main()
 #if ENABLE_SYSCALL_STATS
 			calls_stats[call_nr]++;
 #endif
-
 			result = (*call_vec[call_nr])();
-
 		}
 		break;
 	}
-
 	/* Send reply. */
 	if (result != SUSPEND) setreply(who_p, result);
 	sendreply();
        
 #if EBPROFILE
-        if (ebprofiling)
-        {
-            /* If pros process number is not cached, look it up */
-            if (pros_proc_nr == 0)
-            {
-                minix_rs_lookup("pros", &pros_proc_nr);
-            }
-            /* Forward message to PROS */ 
-            asynsend(pros_proc_nr, &m_in);
-        }
+        //probe();
 #endif
   }
   return(OK);

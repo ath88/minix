@@ -80,7 +80,7 @@ _PROTOTYPE (int (*call_vec[]), (void) ) = {
 	do_set, 	/* 66 = setgroups */
 	do_getmcontext,	/* 67 = getmcontext */
 	do_setmcontext,	/* 68 = setmcontext */
-	do_ebp_ctl	/* 69 = ebp_ctl */
+	no_sys	        /* 69 ) unused */
 	no_sys,		/* 70 = unused	*/
 	do_sigaction,	/* 71 = sigaction   */
 	do_sigsuspend,	/* 72 = sigsuspend  */

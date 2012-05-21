@@ -72,6 +72,7 @@
 
 PRIVATE char command[4096];
 
+int ebprofiling : 1;
 PRIVATE int req_type;
 PRIVATE int do_run= 0;          /* 'run' command instead of 'up' */
 PRIVATE char *req_label = NULL;
@@ -296,6 +297,13 @@ PRIVATE void failure(int request)
   exit(errno);
 }
 
-
+/* Toggles event-based profiling.
+ */
+void
+handle_ebpctl(void)
+{
+        (ebprofiling) ? (ebprofiling = 0) : (ebprofiling = 1);
+        return;  
+}
 
 #endif /* EBPROFILE */
