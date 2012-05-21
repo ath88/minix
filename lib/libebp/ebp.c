@@ -324,7 +324,13 @@ PRIVATE void failure(int request)
 void
 handle_ebpctl(void)
 {
+        endpoint_t proc_nr = 0;
         (ebprofiling) ? (ebprofiling = 0) : (ebprofiling = 1);
+        minix_rs_lookup("pros", &proc_nr);
+        // send msg to proc_nr
+        message m;
+        m.m_type = 13;
+        sendnb(proc_nr, &m);
         return;  
 }
 
