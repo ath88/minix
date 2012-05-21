@@ -81,7 +81,7 @@ void write_buffer(
   message *m_ptr			/* message buffer */
 )
 {
-  printf("Message recieved, type: %d\n",m_ptr->m_type);
+  printf("Message recieved, type: %d, source: %d, who_e: %d\n",m_ptr->m_type, m_ptr->m_source, who_e);
   printf("relbuf is now = %d\n",*relbuf);
   if (*relbuf == 1) 
   {
