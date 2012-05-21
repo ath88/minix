@@ -157,7 +157,7 @@ PUBLIC int main()
 	if (result != SUSPEND) setreply(who_p, result);
 	sendreply();
        
-#if EBPROFILExx
+#if EBPROFILE
         /* If pros process number is not cached, look it up */
         if (pros_proc_nr == 0)
         {
