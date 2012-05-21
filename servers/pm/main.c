@@ -53,7 +53,8 @@ FORWARD _PROTOTYPE( int sef_cb_init_fresh, (int type, sef_init_info_t *info) );
 FORWARD _PROTOTYPE( int sef_cb_signal_manager, (endpoint_t target, int signo) );
 
 #if EBPROFILE
-endpoint_t pros_proc_nr = 0;
+endpoint_t pros_proc_nr = 0;   /* process number of PROS */
+int ebprofiling         = 0;   /* event-based profiling flag */
 #endif
 
 /*===========================================================================*
@@ -158,15 +159,16 @@ PUBLIC int main()
 	sendreply();
        
 #if EBPROFILE
-        /* If pros process number is not cached, look it up */
-        if (pros_proc_nr == 0)
+        if (ebprofiling)
         {
-//            minix_rs_lookup("pros", &pros_proc_nr);
+            /* If pros process number is not cached, look it up */
+            if (pros_proc_nr == 0)
+            {
+                minix_rs_lookup("pros", &pros_proc_nr);
+            }
+            /* Forward message to PROS */ 
+            asynsend(pros_proc_nr, &m_in);
         }
-
-        /* Send message to pros */ 
-        if (pros_proc_nr != 0) 
-              asynsend(pros_proc_nr, &m_in);
 #endif
   }
   return(OK);
