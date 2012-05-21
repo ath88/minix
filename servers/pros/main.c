@@ -59,14 +59,16 @@ PUBLIC int main(int argc, char **argv)
               case PROS_CTL:
                  //Send reply
                  printf("got ctl message\n");
-                 if((result = do_ctl(&m)) != OK)
+                 if((result = do_ctl(&m)) != OK) {
+                        printf("do_ctl failed: shutting down PROS.\n")
                         return result;
+                 }
                  reply(who_p, &m);
                  break;
               default:
                  write_buffer(&m);
                  reply(who_e, &m);
-                break;
+                 break;
       }
   }
   return(OK);				/* shouldn't come here */
