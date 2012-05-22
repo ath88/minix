@@ -10,7 +10,7 @@
 #include <sys/ipc.h>
 
 /* Allocate space for the global variables. */
-endpoint_t who_e;	/* caller's proc number */
+endpoint_t who_e, who_p;	/* caller's proc number */
 int callnr;		        /* system call number */
 int bitmap;
 ebp_sample_buffer *first;
@@ -59,11 +59,9 @@ PUBLIC int main(int argc, char **argv)
               case PROS_CTL:
                  //Send reply
                  printf("got ctl message\n");
-                 if((result = do_ctl(&m)) != OK) {
-                        printf("do_ctl failed: shutting down PROS.\n")
+                 if((result = do_ctl(&m)) != OK)
                         return result;
-                 }
-                 reply(who_p, &m);
+                 reply(who_e, &m);
                  break;
               case PROS_PROBE:
                  reply(who_e, &m);
@@ -73,7 +71,7 @@ PUBLIC int main(int argc, char **argv)
               default:
                  reply(who_e, &m);
                  write_buffer(&m);
-                 break;
+                break;
       }
   }
   return(OK);				/* shouldn't come here */

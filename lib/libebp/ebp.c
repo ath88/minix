@@ -72,7 +72,6 @@
 
 PRIVATE char command[4096];
 
-int ebprofiling : 1;
 PRIVATE int req_type;
 PRIVATE int do_run= 0;          /* 'run' command instead of 'up' */
 PRIVATE char *req_label = NULL;
@@ -325,19 +324,6 @@ PRIVATE void failure(int request)
   exit(errno);
 }
 
-/* Toggles event-based profiling.
- */
-void
-handle_ebpctl(void)
-{
-        endpoint_t proc_nr = 0;
-        (ebprofiling) ? (ebprofiling = 0) : (ebprofiling = 1);
-        minix_rs_lookup("pros", &proc_nr);
-        // send msg to proc_nr
-        message m;
-        m.m_type = 13;
-        sendnb(proc_nr, &m);
-        return;  
-}
+
 
 #endif /* EBPROFILE */
