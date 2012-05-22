@@ -72,7 +72,7 @@
 
 PRIVATE char command[4096];
 
-int ebprofiling : 1;
+int ebprofiling = 1;
 PRIVATE int req_type;
 PRIVATE int do_run= 0;          /* 'run' command instead of 'up' */
 PRIVATE char *req_label = NULL;

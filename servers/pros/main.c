@@ -63,7 +63,7 @@ PUBLIC int main(int argc, char **argv)
                         printf("do_ctl failed: shutting down PROS.\n")
                         return result;
                  }
-                 reply(who_p, &m);
+                 reply(who_e, &m);
                  break;
               case PROS_PROBE:
                  reply(who_e, &m);

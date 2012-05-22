@@ -34,7 +34,6 @@ typedef struct {int m10i1, m10i2, m10i3, m10i4;
 
 typedef struct {
   endpoint_t m_source;		/* who sent the message */
-  endpoint_t m_orig;		/* where the message originated */
   int m_type;			/* what kind of message is it */
   union {
 	mess_1 m_m1;
