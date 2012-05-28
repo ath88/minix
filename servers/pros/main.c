@@ -60,7 +60,7 @@ PUBLIC int main(int argc, char **argv)
                  //Send reply
                  printf("got ctl message\n");
                  if((result = do_ctl(&m)) != OK) {
-                        printf("do_ctl failed: shutting down PROS.\n")
+                        printf("do_ctl failed: shutting down PROS.\n");
                         return result;
                  }
                  reply(who_e, &m);
@@ -71,7 +71,7 @@ PUBLIC int main(int argc, char **argv)
                  write_buffer(&m);
                  break;
               default:
-                 reply(who_e, &m);
+                 // default we dont reply, this is only sent nb
                  write_buffer(&m);
                  break;
       }

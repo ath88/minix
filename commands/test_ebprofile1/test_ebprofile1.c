@@ -16,7 +16,7 @@ main(int argc, char *argv[])
   int r;
   message m;
   printf("starting test-probes\n");
-  m.m_type = 1337;
+  m.m_type = PM_PROS_CTL;
   while(1) 
   {
     printf("trying\n");
