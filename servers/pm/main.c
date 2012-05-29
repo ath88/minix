@@ -67,8 +67,6 @@ PUBLIC int main()
   /* SEF local startup. */
   sef_local_startup();
 
-  pros_proc_nr = 0;
-  
   /* This is PM's main loop-  get work and do it, forever and forever. */
   while (TRUE) {
 	  int ipc_status;
@@ -114,7 +112,12 @@ PUBLIC int main()
 
 	switch(call_nr)
 	{
-	case PM_SETUID_REPLY:
+        case PM_PROS_CTL:
+                printf("got pros ctl in server pm\n");
+                handle_ebpctl();
+		result = OK;
+                break;
+        case PM_SETUID_REPLY:
 	case PM_SETGID_REPLY:
 	case PM_SETSID_REPLY:
 	case PM_EXEC_REPLY:

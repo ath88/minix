@@ -59,8 +59,9 @@ PUBLIC int main(int argc, char **argv)
               case PROS_CTL:
                  //Send reply
                  printf("got ctl message\n");
-                 if((result = do_ctl(&m)) != OK)
+                 if((result = do_ctl(&m)) != OK) {
                         return result;
+                 }
                  reply(who_e, &m);
                  break;
               case PROS_PROBE:
@@ -69,7 +70,7 @@ PUBLIC int main(int argc, char **argv)
                  write_buffer(&m);
                  break;
               default:
-                 reply(who_e, &m);
+                 // default we dont reply, this is only sent nb
                  write_buffer(&m);
                 break;
       }
