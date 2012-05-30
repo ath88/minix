@@ -21,7 +21,7 @@
 #define LFILE  1
 #define NETW   2
 
-#define BUFFER_SIZE 1024 // has to match with kernel/ebprofile.h
+#define BUFFER_SIZE 1024
 
 typedef struct
 {

@@ -92,8 +92,20 @@ start_ebp_server()
 {
   printf("startserver 0\n");
   message m;
+  m.RS_CMD_ADDR = "pros";
+  m.RS_CMD_LEN = 4;
   int request = RS_UP;
   int result = EXIT_SUCCESS;
+
+  /* Build request message and send the request. */
+  if(result == OK) {
+    if (_syscall(RS_PROC_NR, request, &m) == -1)
+      failure(request);
+    result = m.m_type;
+  }
+
+  return result;
+
   char *progname = "pros";
   strcpy(command, "/usr/sbin/pros ");
   /* Arguments for RS to start a new service */
@@ -187,14 +199,24 @@ void
 ebp_stop (void)
 {
   message m;
-  m.PROS_BUFFER1	= 0;
-  m.PROS_BUFFER2	= 0;
-  m.PROS_BITMAP		= 0;
-  m.PROS_RELBUF		= 0;
-//  free(buffers->first);
-//  free(buffers->second);
-//  free(buffers->relbuf);
-//  _syscall(PM_PROC_NR, EBPROF, &m);
+  m.RS_CMD_ADDR = "pros";
+  m.RS_CMD_LEN = 4;
+  _syscall(RS_PROC_NR, RS_DOWN, &m);
+
+  /* pros server has been shut down now, deallocating shared memory */
+
+  int shmid1, shmid2, shmid3;
+  if ((shmid1 = shmget(SHMKEY1, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) 
+           printf("Could not get shmid during shutdown.\n");
+  if ((shmid2 = shmget(SHMKEY2, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) 
+           printf("Could not get shmid during shutdown.\n");
+  if ((shmid3 = shmget(SHMKEY3, sizeof (ebp_buffer_indicator), IPC_CREAT | 0666)) < 0) 
+           printf("Could not get shmid during shutdown.\n");
+
+  shmctl(shmid1, IPC_RMID, &buffers->first);
+  shmctl(shmid2, IPC_RMID, &buffers->second);
+  shmctl(shmid3, IPC_RMID, &buffers->indicator);
+
   return;
 }
 
@@ -211,13 +233,11 @@ ebp_get (ebp_sample_buffer *buffer)
         {
                 buffers->indicator->relbuf = 0;
                 buf_ptr = buffers->first; 
-                mthread_rwlock_unlock(&buffers->second->lock);
         }
         else
         {
                 buffers->indicator->relbuf = 1;
                 buf_ptr = buffers->second; 
-                mthread_rwlock_unlock(&buffers->first->lock);
         }
 
         mthread_rwlock_wrlock(&buf_ptr->lock);
@@ -228,6 +248,9 @@ ebp_get (ebp_sample_buffer *buffer)
 
         reached = buf_ptr->reached;
         buf_ptr->reached = 0;
+
+        mthread_rwlock_unlock(&buf_ptr->lock);
+
         tmp = reached;
 
         if (reached > BUFFER_SIZE)
@@ -240,12 +263,12 @@ ebp_get (ebp_sample_buffer *buffer)
 void
 alloc_buffers (void)
 {
-  int shmid1, shmid2, shmid3;
 
   fprintf(stdout,"allocB start\n");
 
   buffers = malloc(sizeof(ebp_buffers));
 
+  int shmid1, shmid2, shmid3;
   if ((shmid1 = shmget(SHMKEY1, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) 
            printf("Could not allocate shared memory. Disabling event-based profiling.\n");
   if ((shmid2 = shmget(SHMKEY2, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) 

@@ -84,7 +84,7 @@ start ()
 // TODO pkill process, if exists. probably needs to report back to user what happened
 int
 stop () {
-  printf("Stopping");
+  printf("Stopping\n");
   ebp_stop();
   //sigaction(SIGKILL); // Read docs, noobz
   return 0;
