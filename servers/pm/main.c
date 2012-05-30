@@ -112,9 +112,9 @@ PUBLIC int main()
 
 	switch(call_nr)
 	{
-        case PM_PROS_CTL:
+        case PROS_SERVER_CTL:
                 printf("got pros ctl in server pm\n");
-                handle_ebpctl();
+                handle_ebpctl(&m_in);
 		result = OK;
                 break;
         case PM_SETUID_REPLY:
@@ -149,6 +149,9 @@ PUBLIC int main()
 #if ENABLE_SYSCALL_STATS
 			calls_stats[call_nr]++;
 #endif
+#if EBPROFILE
+    			server_probe(&m_in);
+#endif
 
 			result = (*call_vec[call_nr])();
 
@@ -160,17 +163,6 @@ PUBLIC int main()
 	if (result != SUSPEND) setreply(who_p, result);
 	sendreply();
        
-#if EBPROFILExx
-        /* If pros process number is not cached, look it up */
-        if (pros_proc_nr == 0)
-        {
-//            minix_rs_lookup("pros", &pros_proc_nr);
-        }
-
-        /* Send message to pros */ 
-        if (pros_proc_nr != 0) 
-              asynsend(pros_proc_nr, &m_in);
-#endif
   }
   return(OK);
 }

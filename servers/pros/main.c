@@ -10,12 +10,12 @@
 #include <sys/ipc.h>
 
 /* Allocate space for the global variables. */
-endpoint_t who_e, who_p;	/* caller's proc number */
+endpoint_t who_e;	/* caller's proc number */
 int callnr;		        /* system call number */
 int bitmap;
 ebp_sample_buffer *first;
 ebp_sample_buffer *second;
-unsigned int *relbuf;
+ebp_buffer_indicator *indicator;
 int shmid1, shmid2, shmid3;
 
 /* Declare some local functions. */
@@ -38,7 +38,6 @@ PUBLIC int main(int argc, char **argv)
  * sending the reply. The loop never terminates, unless a panic occurs.
  */
   message m;
-  int result;                 
   
   shmid1 = 0;
   shmid2 = 0;
@@ -59,9 +58,7 @@ PUBLIC int main(int argc, char **argv)
               case PROS_CTL:
                  //Send reply
                  printf("got ctl message\n");
-                 if((result = do_ctl(&m)) != OK) {
-                        return result;
-                 }
+                 do_ctl(&m);
                  reply(who_e, &m);
                  break;
               case PROS_PROBE:
@@ -70,9 +67,8 @@ PUBLIC int main(int argc, char **argv)
                  write_buffer(&m);
                  break;
               default:
-                 // default we dont reply, this is only sent nb
                  write_buffer(&m);
-                break;
+                 break;
       }
   }
   return(OK);				/* shouldn't come here */
@@ -86,24 +82,39 @@ void write_buffer(
 )
 {
   printf("Message recieved, type: %d, source: %d, who_e: %d\n",m_ptr->m_type, m_ptr->m_source, who_e);
-  printf("relbuf is now = %d\n",*relbuf);
-  if (*relbuf == 1) 
+  printf("relbuf is now = %d\n",indicator->relbuf);
+
+  ebp_sample_buffer *buffer;
+  mthread_rwlock_rdlock(&indicator->lock);
+
+  if (indicator->relbuf == 1) 
   {
-    first->sample[first->reached].m_type = m_ptr->m_type;
-    first->sample[first->reached].m_source = m_ptr->m_source;
-    first->sample[first->reached].field = m_ptr->PROS_TYPE;
-    first->sample[first->reached].payload = m_ptr->PROS_PAYLOAD;
-    first->reached++; 
-  } 
-  else 
+    buffer = first;
+  }
+  else
   {
-    second->sample[second->reached].m_type = m_ptr->m_type;
-    second->sample[second->reached].m_source = m_ptr->m_source;
-    second->sample[second->reached].field = m_ptr->PROS_TYPE;
-    second->sample[second->reached].payload = m_ptr->PROS_PAYLOAD;
-    second->reached++; 
+    buffer = second;
   }
 
+  printf("unlocking relbu\n");
+  mthread_rwlock_wrlock(&buffer->lock);
+  mthread_rwlock_unlock(&indicator->lock);
+
+  if (buffer->reached++ >= BUFFER_SIZE)
+  {
+    printf("buffer is full!\n");
+    mthread_rwlock_unlock(&buffer->lock);
+    return;
+  }
+
+  buffer->sample[buffer->reached].m_type = m_ptr->m_type;
+  buffer->sample[buffer->reached].m_source = m_ptr->m_source;
+  buffer->sample[buffer->reached].field = m_ptr->PROS_TYPE;
+  buffer->sample[buffer->reached].payload = m_ptr->PROS_PAYLOAD;
+  printf("written, releasing lock!\n");
+  mthread_rwlock_unlock(&buffer->lock);
+
+  return;
 }
 
 
@@ -127,7 +138,7 @@ void get_work(
   message *m_ptr			/* message buffer */
 )
 {
-    printf("waiting for new message!\n"); 
+    printf("Waiting for new message!\n"); 
     int status = sef_receive(ANY, m_ptr);   /* blocks until message arrives */
     if (OK != status)
         panic("failed to receive message!: %d", status);
@@ -139,7 +150,7 @@ void get_work(
  *				do_ctl                                       *
  *===========================================================================*/
 int do_ctl (
-message *m_ptr			/* message buffer */
+  message *m_ptr			/* message buffer */
 )
 {
         int r;
@@ -147,10 +158,9 @@ message *m_ptr			/* message buffer */
         bitmap              = m_ptr->PROS_BITMAP;
 
         if ((r = attach_memory((key_t) m_ptr->PROS_BUFFER1, (key_t) m_ptr->PROS_BUFFER2, (key_t) m_ptr->PROS_RELBUF)) != OK)
-                printf("PROS: failed to attach shared memory from consumer. Aborting profiling.\n");
+                printf("PROS: failed to attach shared memory from consumer. Can't profile.\n");
 
-        /*printf("Set internals, bitmap = %d, first = %d, second = %d, relbuf = %d\n",ebp_bm,ebp_first,ebp_second,ebp_relevant_buffer);
-        printf("Set internals, relbuf = %d\n", ebp_relevant_buffer);*/
+        printf("Set internals, relbuf = %d\n", indicator->relbuf);
         return r;
 }
 
@@ -163,35 +173,29 @@ int attach_memory(
  key_t key3                               /* shmem key for relevant_buffer */
 )
 {
-    int new_shmid1, new_shmid2, new_shmid3;
-    /* get shared memory ids */
     printf("key for buf1 = %d, buf2 = %d, relbuf = %d\n",key1,key2,key3);
-    if ((new_shmid1 = shmget(key1, sizeof(ebp_sample_buffer), 0666)) < 0)
-        return ENOMEM;
-    if ((new_shmid2 = shmget(key2, sizeof(ebp_sample_buffer), 0666)) < 0)
-        return ENOMEM;
-    if ((new_shmid3 = shmget(key3, sizeof(int), 0666)) < 0)
-        return ENOMEM;
-    printf("shmid for buf1 = %d, buf2 = %d, relbuf = %d\n",new_shmid1, new_shmid2, new_shmid3);
-    
-    /* are we trying to allocate new profiling buffers? */
-//    if (new_shmid1 == shmid1 && new_shmid2 == shmid2 && new_shmid3 == shmid3)
-//        return OK;
 
+    /* get shared memory */
+    if ((shmid1 = shmget(key1, sizeof(ebp_sample_buffer), 0666)) < 0)
+        return ENOMEM;
+    if ((shmid2 = shmget(key2, sizeof(ebp_sample_buffer), 0666)) < 0)
+        return ENOMEM;
+    if ((shmid3 = shmget(key3, sizeof(ebp_buffer_indicator), 0666)) < 0)
+        return ENOMEM;
+    
     /* attach shared memory */
-    if ((first = shmat(new_shmid1, NULL, 0)) == (char *) -1) {
+    if ((first = shmat(shmid1, NULL, 0)) == (ebp_sample_buffer *) -1) {
         return ENOMEM;
     }
-    if ((second = shmat(new_shmid2, NULL, 0)) == (char *) -1) {
+    if ((second = shmat(shmid2, NULL, 0)) == (ebp_sample_buffer *) -1) {
         return ENOMEM;
     }
-    printf("trying to attach\n");
-    if ((relbuf = shmat(new_shmid3, NULL, 0)) == (char *) -1) {
+    if ((indicator = shmat(shmid3, NULL, 0)) == (ebp_buffer_indicator *) -1) {
         return ENOMEM;
     }
     printf("attached buf1, addr = 0x%x, val = %d\n", first, *first);
     printf("attached buf2, addr = 0x%x, val = %d\n", second, *second);
-    printf("attached relbuf, addr = 0x%x, val = %d\n", relbuf, *relbuf);
+    printf("attached indicator, addr = 0x%x, val = %d\n", indicator, *indicator);
     return OK;
 }
 

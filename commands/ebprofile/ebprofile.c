@@ -56,7 +56,7 @@ start ()
   /* Allocates buffers and start profiling */
   buffers = ebp_start(0xFFF); // test bitmap, profiles everything
 
-  printf("buffers allocated, buffer1 = 0x%x, buffer2 = 0x%x relbuf = 0x%x2\n",buffers->first,buffers->second,buffers->relbuf);
+  printf("buffers allocated, buffer1 = 0x%x, buffer2 = 0x%x relbuf = 0x%x2\n",buffers->first,buffers->second,buffers->indicator);
 
   /* Loop consumer, read buffers and write to file or socket */
   int i;
@@ -64,18 +64,12 @@ start ()
   /* NEW FILE OR SOCKET MAGIC */
   while (1)
   {
-//       	printf("first reached = %d\n", buffers->first->reached);
-//       	printf("second reached = %d\n", buffers->second->reached);
-
 	reached = ebp_get(&consumer_buffer);
         if (reached == 0) continue;
-
-//        printf("soo, does this work?, reached = %d \n", reached);
 
 	for (i=0; i< reached; i++)
 	{
            /* Here we would write to a file or a socket or stdout */
-        printf("soo, does this work?\n");
      	printf("m_type = %d, field = %d, payload = %d\n", 
      	  ((consumer_buffer.sample)[i]).m_type,
      	  ((consumer_buffer.sample)[i]).field,

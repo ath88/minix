@@ -1,4 +1,4 @@
 PROG=ebprofile
-LDADD+=-lebp
+LDADD+=-lebp -lmthread
 MAN=
 .include <bsd.prog.mk>

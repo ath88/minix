@@ -10,6 +10,7 @@
 #include <minix/com.h>
 #include <minix/priv.h>
 #include <minix/const.h>
+#include <minix/mthread.h>
 #include <sys/types.h>
 
 #define HELP  0
@@ -24,39 +25,46 @@
 
 typedef struct
 {
-  int time;
   int m_type;
   unsigned int m_source;
   endpoint_t m_destination;
   int field; 
   int payload; 
-
-  /* from kernel/proc.c */
-  unsigned cpu;
-  char p_priority;
-  struct priv *p_priv;
-} kcall_sample;
+} ebp_m_sample;
 
 typedef struct
 {
-  kcall_sample sample[BUFFER_SIZE];
+  ebp_m_sample sample[BUFFER_SIZE];
   unsigned int reached;
-  int lock;
+  mthread_rwlock_t lock;
 } ebp_sample_buffer;
 
+typedef struct
+{
+  unsigned int relbuf;
+  mthread_rwlock_t lock;
+} ebp_buffer_indicator;
 
 typedef struct
 {
   ebp_sample_buffer *first;
   ebp_sample_buffer *second;
-  unsigned int *relbuf;
+  ebp_buffer_indicator *indicator;
 } ebp_buffers;
 
-/* userland functions */
+/* userspace probe */
+void probe(int type, int payload);
+
+/* userspace consumer functions */
 ebp_buffers *ebp_start (int bitmap);
 void ebp_stop (void);
 int ebp_get (ebp_sample_buffer *buffer);
-ebp_sample_buffer *alloc_buffers (key_t key);
-void probe(int type, int payload);
+
+/* library functions */
+void alloc_buffers (void);
+
+/* serverspace functions */
+void handle_ebpctl();
+void server_probe(message *m);
 
 #endif /* _TOOL_EBPROF_H */

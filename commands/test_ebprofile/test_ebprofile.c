@@ -9,6 +9,7 @@
 
 #include <lib.h>
 #include <minix/rs.h>
+#include <minix/ebprofile.h>
 
 int
 main(int argc, char *argv[])

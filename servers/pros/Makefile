@@ -3,7 +3,7 @@ PROG=	pros
 SRCS=	main.c
 
 DPADD+=	${LIBSYS}
-LDADD+=	-lsys -lc
+LDADD+=	-lsys -lmthread -lc
 
 MAN=
 

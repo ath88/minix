@@ -13,14 +13,20 @@
 int
 main(int argc, char *argv[])
 {
-  int r;
-  message m;
   printf("starting test-probes\n");
-  m.m_type = PM_PROS_CTL;
   while(1) 
   {
-    printf("trying\n");
-    r = sendrec(PM_PROC_NR, &m);
-    sleep(1);
+    message m;
+    m.m_type = PROS_SERVER_CTL;
+    m.PROS_SERV_BMAP = 1;
+    printf("trying on\n");
+    sendrec(PM_PROC_NR, &m);
+    sleep(4);
+    printf("trying off\n");
+    message m2;
+    m2.m_type = PROS_SERVER_CTL;
+    m2.PROS_SERV_BMAP = 0;
+    sendrec(PM_PROC_NR, &m2);
+    sleep(4);
   }
 }  

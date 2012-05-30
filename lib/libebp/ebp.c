@@ -17,6 +17,7 @@
 #include <minix/const.h>
 #include <minix/type.h>
 #include <minix/ipc.h>
+#include <sys/shm.h>
 #include <minix/rs.h>
 #include <minix/syslib.h>
 #include <minix/bitmap.h>
@@ -34,6 +35,7 @@
 #include "config.h"
 #include "proto.h"
 
+#include <minix/mthread.h>
 
 
 #include <stdlib.h>
@@ -55,6 +57,9 @@
 
 #if EBPROFILE
 
+#define SHMKEY1 0x3451
+#define SHMKEY2 0x3452
+#define SHMKEY3 0x3453
 #define OK 0
 
 #define RUN_CMD         "run"
@@ -66,19 +71,10 @@
 #define DEFAULT_LU_MAXTIME 0                    /* Default lu max time */
 
 
-/* Until mutexes are implemented */
-#define mutex_lock() (void)0
-#define mutex_unlock() (void)0
-
 PRIVATE char command[4096];
 
-int ebprofiling = 1;
-PRIVATE int req_type;
-PRIVATE int do_run= 0;          /* 'run' command instead of 'up' */
+int ebprofiling = 0;
 PRIVATE char *req_label = NULL;
-PRIVATE char *req_path = NULL;
-PRIVATE char *req_path_self = SELF_REQ_PATH;
-PRIVATE char *req_args = "";
 PRIVATE int req_major = 0;
 PRIVATE int devman_id = 0;
 PRIVATE int req_dev_style = STYLE_NDEV;
@@ -86,8 +82,6 @@ PRIVATE long req_period = 0;
 PRIVATE char *req_script = NULL;
 PRIVATE char *req_config = PATH_CONFIG;
 PRIVATE int custom_config_file = 0;
-PRIVATE int req_lu_state = DEFAULT_LU_STATE;
-PRIVATE int req_lu_maxtime = DEFAULT_LU_MAXTIME;
 
 PRIVATE void failure(int request);
 
@@ -106,11 +100,7 @@ start_ebp_server()
   struct rs_config config;
   u32_t rss_flags = 0;
 
-  printf("startserver 1\n");
-
   assert(progname); /* an absolute path was required */
-
-  printf("startserver 2\n");
 
   if (req_config) {
     assert(progname);
@@ -118,9 +108,6 @@ start_ebp_server()
     if(!parse_config(progname, custom_config_file, req_config, &config))
     errx(1, "couldn't parse config");
   }
-
-  printf("startserver 3\n");
-
 
   /* Set specifics */
   config.rs_start.rss_cmd= command;
@@ -145,8 +132,6 @@ start_ebp_server()
   assert(config.rs_start.rss_priority < NR_SCHED_QUEUES);
   assert(config.rs_start.rss_quantum > 0);
 
-  printf("startserver 4\n");
-
   m.RS_CMD_ADDR = (char *) &config.rs_start;
 
   /* Build request message and send the request. */
@@ -156,8 +141,6 @@ start_ebp_server()
     result = m.m_type;
   }
 
-  printf("startserver 5\n");
-
   return result;
 }
 
@@ -165,68 +148,37 @@ start_ebp_server()
 ebp_buffers *
 ebp_start (int bitmap)
 {
-  unsigned int shmkey1, shmkey2, shmkey3;
   endpoint_t endpoint = 0;
-
-  /* Generate keys for shared memory */
-  shmkey1 = 0x1234;
-  shmkey2 = 0x5678;
-  shmkey3 = 0x1945;
-
   minix_rs_lookup("pros",&endpoint);
-  printf("server is at; %d",endpoint);
   if (endpoint == 0) 
   {
-
+    printf("PROS server not found, starting\n");
     if(start_ebp_server() == OK)
-    {
-      printf("ebpserver started\n");
-    } else printf("ebpserver not startet\n");
+      printf("PROS server started\n");
+    minix_rs_lookup("pros",&endpoint);
+  }
+  else
+  {
+    printf("PROS server found\n");
   }
 
-  printf("ebpserver pid addr = %x\n",&endpoint);
-  minix_rs_lookup("pros",&endpoint);
-
-  printf("ebpserver pid addr = %x\n",&endpoint);
-  printf("ebpserver pid = %d\n",endpoint);
-
-  (void)fprintf(stdout,"LIB start1\n");
-  message m;
-
-  (void)fprintf(stdout,"LIB start101\n");
-  buffers = malloc(sizeof(ebp_buffers));
-
-  (void)fprintf(stdout,"LIB start11\n");
-  buffers->first = alloc_buffers(shmkey1);
-
-  (void)fprintf(stdout,"LIB start12\n");
-  buffers->second = alloc_buffers(shmkey2);
-
-  int shmid;
-  (void)fprintf(stdout,"LIB start13\n");
-  if ((shmid = shmget(shmkey3, sizeof (int), IPC_CREAT | 0666)) < 0) {
-           printf("Could not allocate shared memory. Disabling event-based profiling.\n");
-           return ENOMEM;
-  }
-  if ((buffers->relbuf = shmat(shmid, NULL, 0)) == (char *) -1) {
-    perror("shmat");
-    exit(1);
-  }
-  (void)fprintf(stdout,"LIB start2\n");
+  alloc_buffers();
 
   /* Set profiling flag */
   bitmap &= 0xFFF;
- 
-  (void)fprintf(stdout,"LIB start3\n");
-  /* do syscall */ 
-  m.PROS_BUFFER1	= shmkey1;
-  m.PROS_BUFFER2	= shmkey2;
-  m.PROS_RELBUF         = shmkey3;
+
+  /* tell pros server to start */ 
+  message m;
+  m.PROS_BUFFER1	= SHMKEY1;
+  m.PROS_BUFFER2	= SHMKEY2;
+  m.PROS_RELBUF         = SHMKEY3;
   m.PROS_BITMAP	        = bitmap;
-  (void)fprintf(stdout,"LIB start4 newer\n");
-  sleep(1);
   _syscall(endpoint, PROS_CTL, &m);
-  (void)fprintf(stdout,"LIB start5\n");
+
+  /* tell pm to start profiling */
+  m.PROS_SERV_BMAP         = 1; 
+//  _syscall(PM_PROC_NR, PROS_SERVER_CTL, &m);
+
   return buffers;
 }
 
@@ -235,13 +187,13 @@ void
 ebp_stop (void)
 {
   message m;
-  m.PROS_BUFFER1	= NULL;
-  m.PROS_BUFFER2	= NULL;
-  m.PROS_BITMAP		= 0x0;
-  m.PROS_RELBUF		= 0x0;
-  free(buffers->first);
-  free(buffers->second);
-  free(buffers->relbuf);
+  m.PROS_BUFFER1	= 0;
+  m.PROS_BUFFER2	= 0;
+  m.PROS_BITMAP		= 0;
+  m.PROS_RELBUF		= 0;
+//  free(buffers->first);
+//  free(buffers->second);
+//  free(buffers->relbuf);
 //  _syscall(PM_PROC_NR, EBPROF, &m);
   return;
 }
@@ -253,17 +205,27 @@ ebp_get (ebp_sample_buffer *buffer)
         unsigned int tmp, reached;
         ebp_sample_buffer *buf_ptr;
 
-        mutex_lock();
-        if (*buffers->relbuf == 1)
+
+        mthread_rwlock_wrlock(&buffers->indicator->lock);
+        if (buffers->indicator->relbuf == 1)
         {
-                *buffers->relbuf = 0;
+                buffers->indicator->relbuf = 0;
                 buf_ptr = buffers->first; 
+                mthread_rwlock_unlock(&buffers->second->lock);
         }
         else
         {
-                *buffers->relbuf = 1;
+                buffers->indicator->relbuf = 1;
                 buf_ptr = buffers->second; 
+                mthread_rwlock_unlock(&buffers->first->lock);
         }
+
+        mthread_rwlock_wrlock(&buf_ptr->lock);
+        mthread_rwlock_unlock(&buffers->indicator->lock);
+
+
+        memcpy(buffer, (void *)buf_ptr->sample, sizeof(ebp_m_sample[reached]));
+
         reached = buf_ptr->reached;
         buf_ptr->reached = 0;
         tmp = reached;
@@ -271,47 +233,54 @@ ebp_get (ebp_sample_buffer *buffer)
         if (reached > BUFFER_SIZE)
           reached = BUFFER_SIZE;
 
-	memcpy(buffer, (void *)buf_ptr->sample, sizeof(kcall_sample[reached]));
-
-        mutex_unlock();
         return tmp;
 }
 
 /* Allocates memory for double buffering */
-ebp_sample_buffer *
-alloc_buffers (key_t key)
+void
+alloc_buffers (void)
 {
-  fprintf(stdout,"allocB start\n");
-  int shmid;
-  char *buffer;
+  int shmid1, shmid2, shmid3;
 
-  if ((shmid = shmget(key, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) {
+  fprintf(stdout,"allocB start\n");
+
+  buffers = malloc(sizeof(ebp_buffers));
+
+  if ((shmid1 = shmget(SHMKEY1, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) 
            printf("Could not allocate shared memory. Disabling event-based profiling.\n");
-           return ENOMEM;
-  }
-  if ((buffer = shmat(shmid, NULL, 0)) == (char *)-1) {
+  if ((shmid2 = shmget(SHMKEY2, sizeof (ebp_sample_buffer), IPC_CREAT | 0666)) < 0) 
+           printf("Could not allocate shared memory. Disabling event-based profiling.\n");
+  if ((shmid3 = shmget(SHMKEY3, sizeof (ebp_buffer_indicator), IPC_CREAT | 0666)) < 0) 
+           printf("Could not allocate shared memory. Disabling event-based profiling.\n");
+
+  if ((buffers->first = shmat(shmid1, NULL, 0)) == (char *)-1) 
            printf("Could not attach shared memory. Disabling event-based profiling.\n");
-           return ENOMEM;
-  }
-  return (ebp_sample_buffer *)buffer;
+  if ((buffers->second = shmat(shmid2, NULL, 0)) == (char *)-1) 
+           printf("Could not attach shared memory. Disabling event-based profiling.\n");
+  if ((buffers->indicator = shmat(shmid3, NULL, 0)) == (char *)-1) 
+           printf("Could not attach shared memory. Disabling event-based profiling.\n");
+
+  mthread_rwlock_init(&buffers->first->lock); 
+  mthread_rwlock_init(&buffers->second->lock); 
+  mthread_rwlock_init(&buffers->indicator->lock); 
+
+  return;
 }
 
 void
 probe (int type, int payload)
 {
   int pros_proc_nr = 0;
+  minix_rs_lookup("pros", &pros_proc_nr);
+  if (pros_proc_nr == 0) 
+    return;                 // returning if we cant find pros server
+
   message m;
   m.m_type = PROS_PROBE;
   m.PROS_TYPE = type;
   m.PROS_PAYLOAD = payload;
-
-  minix_rs_lookup("pros", &pros_proc_nr);
-  if (pros_proc_nr != 0) 
-  {
-//    printf("pros server found, pid = %d\n",pros_proc_nr);
-    sendrec(pros_proc_nr, &m);
-//    printf("message sent\n");
-  } else printf("pros server not found, cant fire probe\n");
+  sendrec(pros_proc_nr, &m);
+  // message is sent, we need to wait for response
 
   return;
 }
@@ -325,25 +294,27 @@ PRIVATE void failure(int request)
   exit(errno);
 }
 
-<<<<<<< HEAD
-
-=======
 /* Toggles event-based profiling.
  */
 void
-handle_ebpctl(void)
+handle_ebpctl(message *m)
 {
-        printf("PM:handling ebpctl\n"); 
-        endpoint_t proc_nr = 0;
-        (ebprofiling) ? (ebprofiling = 0) : (ebprofiling = 1);
-        minix_rs_lookup("pros", &proc_nr);
-        // send msg to proc_nr
-        message m;
-        m.m_type = 13;
-        printf("PM:sending nb to %d\n", proc_nr);
-        sendnb(proc_nr, &m);
+        printf("PM:handling ebpctl: %d\n",m->PROS_SERV_BMAP); 
+        ebprofiling = m->PROS_SERV_BMAP;
         return;  
 }
->>>>>>> e84e1f35ab3476424f91812f9100064fc2dc1b6c
+
+void server_probe(message *m)
+{
+        if(ebprofiling == 1) 
+        {
+          endpoint_t proc_nr = 0;
+          minix_rs_lookup("pros", &proc_nr);
+          if (proc_nr == 0)
+            return;
+          sendnb(proc_nr, m);
+        }
+        return;
+}
 
 #endif /* EBPROFILE */

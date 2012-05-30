@@ -14,8 +14,7 @@ EXTERN struct kinfo kinfo;	/* kernel information */
 EXTERN int bitmap;             	/* bitmap */
 EXTERN ebp_sample_buffer *first;	/* first buffer */
 EXTERN ebp_sample_buffer *second;	/* second buffer */
-EXTERN unsigned int *relbuf;	        /* relevant_buffer */
-EXTERN int shmid1, shmid2, shmid3;
+EXTERN ebp_buffer_indicator *indicator;	/* relevant_buffer */
 
 /* Misc.c */
 extern struct utsname uts_val;	/* uname info */
