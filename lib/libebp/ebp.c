@@ -232,18 +232,15 @@ ebp_get (ebp_sample_buffer *buffer)
 //        mthread_rwlock_wrlock(&buf_ptr->lock);
 //        mthread_rwlock_unlock(&buffers->indicator->lock);
 
-
-        memcpy(buffer, (void *)buf_ptr->sample, sizeof(ebp_m_sample[reached]));
-
         reached = buf_ptr->reached;
         buf_ptr->reached = 0;
-
-//        mthread_rwlock_unlock(&buf_ptr->lock);
-
         tmp = reached;
 
         if (reached > BUFFER_SIZE)
           reached = BUFFER_SIZE;
+        memcpy(buffer, (void *)buf_ptr->sample, sizeof(ebp_m_sample[reached]));
+
+//        mthread_rwlock_unlock(&buf_ptr->lock);
 
         return tmp;
 }

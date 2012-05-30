@@ -82,7 +82,6 @@ void write_buffer(
 )
 {
   printf("Message recieved, type: %d, source: %d, who_e: %d\n",m_ptr->m_type, m_ptr->m_source, who_e);
-  printf("relbuf is now = %d\n",indicator->relbuf);
 
   ebp_sample_buffer *buffer;
 //  mthread_rwlock_wrlock(&indicator->lock);
@@ -96,14 +95,14 @@ void write_buffer(
     buffer = second;
   }
 
-  printf("unlocking relbu\n");
 //  mthread_rwlock_wrlock(&buffer->lock);
 //  mthread_rwlock_unlock(&indicator->lock);
 
-  if (buffer->reached++ >= BUFFER_SIZE)
+  if (buffer->reached >= BUFFER_SIZE)
   {
-    printf("buffer is full!\n");
 //    mthread_rwlock_unlock(&buffer->lock);
+    buffer->reached++; 
+    printf("buffer is full!\n");
     return;
   }
 
@@ -111,7 +110,8 @@ void write_buffer(
   buffer->sample[buffer->reached].m_source = m_ptr->m_source;
   buffer->sample[buffer->reached].field = m_ptr->PROS_TYPE;
   buffer->sample[buffer->reached].payload = m_ptr->PROS_PAYLOAD;
-  printf("written, releasing lock!\n");
+  buffer->reached++; 
+
 //  mthread_rwlock_unlock(&buffer->lock);
 
   return;
