@@ -85,7 +85,7 @@ void write_buffer(
   printf("relbuf is now = %d\n",indicator->relbuf);
 
   ebp_sample_buffer *buffer;
-  mthread_rwlock_wrlock(&indicator->lock);
+//  mthread_rwlock_wrlock(&indicator->lock);
 
   if (indicator->relbuf == 1) 
   {
@@ -98,7 +98,7 @@ void write_buffer(
 
   printf("unlocking relbu\n");
 //  mthread_rwlock_wrlock(&buffer->lock);
-  mthread_rwlock_unlock(&indicator->lock);
+//  mthread_rwlock_unlock(&indicator->lock);
 
   if (buffer->reached++ >= BUFFER_SIZE)
   {

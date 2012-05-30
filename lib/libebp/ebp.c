@@ -92,19 +92,8 @@ start_ebp_server()
 {
   printf("startserver 0\n");
   message m;
-  m.RS_CMD_ADDR = "pros";
-  m.RS_CMD_LEN = 4;
   int request = RS_UP;
   int result = EXIT_SUCCESS;
-
-  /* Build request message and send the request. */
-  if(result == OK) {
-    if (_syscall(RS_PROC_NR, request, &m) == -1)
-      failure(request);
-    result = m.m_type;
-  }
-
-  return result;
 
   char *progname = "pros";
   strcpy(command, "/usr/sbin/pros ");
@@ -228,7 +217,7 @@ ebp_get (ebp_sample_buffer *buffer)
         ebp_sample_buffer *buf_ptr;
 
 
-        mthread_rwlock_wrlock(&buffers->indicator->lock);
+//        mthread_rwlock_wrlock(&buffers->indicator->lock);
         if (buffers->indicator->relbuf == 1)
         {
                 buffers->indicator->relbuf = 0;
@@ -240,8 +229,8 @@ ebp_get (ebp_sample_buffer *buffer)
                 buf_ptr = buffers->second; 
         }
 
-        mthread_rwlock_wrlock(&buf_ptr->lock);
-        mthread_rwlock_unlock(&buffers->indicator->lock);
+//        mthread_rwlock_wrlock(&buf_ptr->lock);
+//        mthread_rwlock_unlock(&buffers->indicator->lock);
 
 
         memcpy(buffer, (void *)buf_ptr->sample, sizeof(ebp_m_sample[reached]));
@@ -249,7 +238,7 @@ ebp_get (ebp_sample_buffer *buffer)
         reached = buf_ptr->reached;
         buf_ptr->reached = 0;
 
-        mthread_rwlock_unlock(&buf_ptr->lock);
+//        mthread_rwlock_unlock(&buf_ptr->lock);
 
         tmp = reached;
 
