@@ -67,7 +67,7 @@ PUBLIC int main(int argc, char **argv)
                  write_buffer(&m);
                  break;
               default:
-                 // These are from servers, always sent async, no reply is needed
+                 // These are from servers, always sent async, no reply is expected
                  write_buffer(&m);
                  break;
       }
