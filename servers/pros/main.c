@@ -8,6 +8,7 @@
 #include <minix/endpoint.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
+#include <unistd.h>
 
 /* Allocate space for the global variables. */
 endpoint_t who_e;	/* caller's proc number */
@@ -57,22 +58,46 @@ PUBLIC int main(int argc, char **argv)
       {
               case PROS_CTL:
                  //Send reply
-                 printf("got ctl message\n");
-                 do_ctl(&m);
                  reply(who_e, &m);
+                 do_ctl(&m);
                  break;
               case PROS_PROBE:
+                 //Send reply before writing, to let process return fast as possible
                  reply(who_e, &m);
-                 printf("probe recived, type = '%d', payload = '%d'\n",m.PROS_TYPE,m.PROS_PAYLOAD);
                  write_buffer(&m);
                  break;
               default:
+                 // These are from servers, always sent async, no reply is needed
                  write_buffer(&m);
                  break;
       }
   }
-  return(OK);				/* shouldn't come here */
+  return(OK);				/* shouldn't get here */
 }
+
+/* SIMPLE BAD LOCK IMPLEMENTATION */
+void
+init_lock (int lock)
+{
+  lock = 0;
+}
+
+void
+acquire (int lock) 
+{
+  while(lock == 1) 
+    usleep(10);
+  // this is where shit breaks  
+  lock = 1;
+}
+
+void 
+release (int lock)
+{
+  lock = 0;
+}
+
+
 
 /*===========================================================================*
  *				write_buffer                                 *
@@ -81,10 +106,8 @@ void write_buffer(
   message *m_ptr			/* message buffer */
 )
 {
-  printf("Message recieved, type: %d, source: %d, who_e: %d\n",m_ptr->m_type, m_ptr->m_source, who_e);
-
   ebp_sample_buffer *buffer;
-//  mthread_rwlock_wrlock(&indicator->lock);
+  acquire(indicator->checkpoint);
 
   if (indicator->relbuf == 1) 
   {
@@ -95,14 +118,13 @@ void write_buffer(
     buffer = second;
   }
 
-//  mthread_rwlock_wrlock(&buffer->lock);
-//  mthread_rwlock_unlock(&indicator->lock);
+  acquire(buffer->checkpoint);
+  release(indicator->checkpoint);
 
   if (buffer->reached >= BUFFER_SIZE)
   {
-//    mthread_rwlock_unlock(&buffer->lock);
+    release(buffer->checkpoint);
     buffer->reached++; 
-    printf("buffer is full!\n");
     return;
   }
 
@@ -112,7 +134,7 @@ void write_buffer(
   buffer->sample[buffer->reached].payload = m_ptr->PROS_PAYLOAD;
   buffer->reached++; 
 
-//  mthread_rwlock_unlock(&buffer->lock);
+  release(buffer->checkpoint);
 
   return;
 }
@@ -138,7 +160,6 @@ void get_work(
   message *m_ptr			/* message buffer */
 )
 {
-    printf("Waiting for new message!\n"); 
     int status = sef_receive(ANY, m_ptr);   /* blocks until message arrives */
     if (OK != status)
         panic("failed to receive message!: %d", status);
@@ -154,13 +175,11 @@ int do_ctl (
 )
 {
         int r;
-        printf("Setting internals1\n");
         bitmap              = m_ptr->PROS_BITMAP;
 
         if ((r = attach_memory((key_t) m_ptr->PROS_BUFFER1, (key_t) m_ptr->PROS_BUFFER2, (key_t) m_ptr->PROS_RELBUF)) != OK)
                 printf("PROS: failed to attach shared memory from consumer. Can't profile.\n");
 
-        printf("Set internals, relbuf = %d\n", indicator->relbuf);
         return r;
 }
 
@@ -173,8 +192,6 @@ int attach_memory(
  key_t key3                               /* shmem key for relevant_buffer */
 )
 {
-    printf("key for buf1 = %d, buf2 = %d, relbuf = %d\n",key1,key2,key3);
-
     /* get shared memory */
     if ((shmid1 = shmget(key1, sizeof(ebp_sample_buffer), 0666)) < 0)
         return ENOMEM;
@@ -193,9 +210,6 @@ int attach_memory(
     if ((indicator = shmat(shmid3, NULL, 0)) == (ebp_buffer_indicator *) -1) {
         return ENOMEM;
     }
-    printf("attached buf1, addr = 0x%x, val = %d\n", first, *first);
-    printf("attached buf2, addr = 0x%x, val = %d\n", second, *second);
-    printf("attached indicator, addr = 0x%x, val = %d\n", indicator, *indicator);
     return OK;
 }
 

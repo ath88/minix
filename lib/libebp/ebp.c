@@ -54,9 +54,6 @@
 
 #include <sys/ipc.h>
 
-
-#if EBPROFILE
-
 #define SHMKEY1 0x3451
 #define SHMKEY2 0x3452
 #define SHMKEY3 0x3453
@@ -82,8 +79,6 @@ PRIVATE long req_period = 0;
 PRIVATE char *req_script = NULL;
 PRIVATE char *req_config = PATH_CONFIG;
 PRIVATE int custom_config_file = 0;
-
-PRIVATE void failure(int request);
 
 ebp_buffers *buffers;
 
@@ -137,8 +132,7 @@ start_ebp_server()
 
   /* Build request message and send the request. */
   if(result == OK) {
-    if (_syscall(RS_PROC_NR, request, &m) == -1)
-      failure(request);
+    _syscall(RS_PROC_NR, request, &m);
     result = m.m_type;
   }
 
@@ -153,14 +147,8 @@ ebp_start (int bitmap)
   minix_rs_lookup("pros",&endpoint);
   if (endpoint == 0) 
   {
-    printf("PROS server not found, starting\n");
     if(start_ebp_server() == OK)
-      printf("PROS server started\n");
     minix_rs_lookup("pros",&endpoint);
-  }
-  else
-  {
-    printf("PROS server found\n");
   }
 
   alloc_buffers();
@@ -202,12 +190,34 @@ ebp_stop (void)
   if ((shmid3 = shmget(SHMKEY3, sizeof (ebp_buffer_indicator), IPC_CREAT | 0666)) < 0) 
            printf("Could not get shmid during shutdown.\n");
 
-  shmctl(shmid1, IPC_RMID, &buffers->first);
-  shmctl(shmid2, IPC_RMID, &buffers->second);
-  shmctl(shmid3, IPC_RMID, &buffers->indicator);
+  shmctl(shmid1, IPC_RMID, (struct shmid_ds*) &buffers->first);
+  shmctl(shmid2, IPC_RMID, (struct shmid_ds*) &buffers->second);
+  shmctl(shmid3, IPC_RMID, (struct shmid_ds*) &buffers->indicator);
 
   return;
 }
+
+void
+init_lock (int lock)
+{
+  lock = 0;
+}
+
+void
+acquire (int lock) 
+{
+  while(lock == 1) 
+    usleep(10);
+  // this is where shit breaks  
+  lock = 1;
+}
+
+void 
+release (int lock)
+{
+  lock = 0;
+}
+
 
 /* Write current profiling information to buffer. */
 int
@@ -216,8 +226,7 @@ ebp_get (ebp_sample_buffer *buffer)
         unsigned int tmp, reached;
         ebp_sample_buffer *buf_ptr;
 
-
-//        mthread_rwlock_wrlock(&buffers->indicator->lock);
+        acquire(buffers->indicator->checkpoint);
         if (buffers->indicator->relbuf == 1)
         {
                 buffers->indicator->relbuf = 0;
@@ -229,8 +238,8 @@ ebp_get (ebp_sample_buffer *buffer)
                 buf_ptr = buffers->second; 
         }
 
-//        mthread_rwlock_wrlock(&buf_ptr->lock);
-//        mthread_rwlock_unlock(&buffers->indicator->lock);
+        acquire(buf_ptr->checkpoint);
+        release(buffers->indicator->checkpoint);
 
         reached = buf_ptr->reached;
         buf_ptr->reached = 0;
@@ -240,7 +249,7 @@ ebp_get (ebp_sample_buffer *buffer)
           reached = BUFFER_SIZE;
         memcpy(buffer, (void *)buf_ptr->sample, sizeof(ebp_m_sample[reached]));
 
-//        mthread_rwlock_unlock(&buf_ptr->lock);
+        release(buf_ptr->checkpoint);
 
         return tmp;
 }
@@ -262,16 +271,16 @@ alloc_buffers (void)
   if ((shmid3 = shmget(SHMKEY3, sizeof (ebp_buffer_indicator), IPC_CREAT | 0666)) < 0) 
            printf("Could not allocate shared memory. Disabling event-based profiling.\n");
 
-  if ((buffers->first = shmat(shmid1, NULL, 0)) == (char *)-1) 
+  if ((buffers->first = shmat(shmid1, NULL, 0)) == (ebp_sample_buffer*) -1) 
            printf("Could not attach shared memory. Disabling event-based profiling.\n");
-  if ((buffers->second = shmat(shmid2, NULL, 0)) == (char *)-1) 
+  if ((buffers->second = shmat(shmid2, NULL, 0)) == (ebp_sample_buffer*) -1) 
            printf("Could not attach shared memory. Disabling event-based profiling.\n");
-  if ((buffers->indicator = shmat(shmid3, NULL, 0)) == (char *)-1) 
+  if ((buffers->indicator = shmat(shmid3, NULL, 0)) == (ebp_buffer_indicator*) -1) 
            printf("Could not attach shared memory. Disabling event-based profiling.\n");
 
-  mthread_rwlock_init(&buffers->first->lock); 
-  mthread_rwlock_init(&buffers->second->lock); 
-  mthread_rwlock_init(&buffers->indicator->lock); 
+  init_lock(buffers->first->checkpoint); 
+  init_lock(buffers->second->checkpoint); 
+  init_lock(buffers->indicator->checkpoint); 
 
   return;
 }
@@ -292,15 +301,6 @@ probe (int type, int payload)
   // message is sent, we need to wait for response
 
   return;
-}
-
-
-/* A request to the RS server failed. Report and exit. 
- */
-PRIVATE void failure(int request)
-{
-  fprintf(stderr, "Request 0x%x to RS failed: %s (error %d)\n", request, strerror(errno), errno);
-  exit(errno);
 }
 
 /* Toggles event-based profiling.
@@ -325,5 +325,3 @@ void server_probe(message *m)
         }
         return;
 }
-
-#endif /* EBPROFILE */

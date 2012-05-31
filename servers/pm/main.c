@@ -32,6 +32,8 @@
 #include "mproc.h"
 #include "param.h"
 
+#include <minix/ebprofile.h>
+
 #include "kernel/const.h"
 #include "kernel/config.h"
 #include "kernel/proc.h"
@@ -52,9 +54,6 @@ FORWARD _PROTOTYPE( void sef_local_startup, (void) );
 FORWARD _PROTOTYPE( int sef_cb_init_fresh, (int type, sef_init_info_t *info) );
 FORWARD _PROTOTYPE( int sef_cb_signal_manager, (endpoint_t target, int signo) );
 
-#if EBPROFILE
-endpoint_t pros_proc_nr = 0;
-#endif
 
 /*===========================================================================*
  *				main					     *
@@ -112,11 +111,12 @@ PUBLIC int main()
 
 	switch(call_nr)
 	{
+#if EBPROFILE
         case PROS_SERVER_CTL:
-                printf("got pros ctl in server pm\n");
                 handle_ebpctl(&m_in);
 		result = OK;
                 break;
+#endif
         case PM_SETUID_REPLY:
 	case PM_SETGID_REPLY:
 	case PM_SETSID_REPLY:

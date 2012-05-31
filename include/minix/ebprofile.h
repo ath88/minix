@@ -36,13 +36,13 @@ typedef struct
 {
   ebp_m_sample sample[BUFFER_SIZE];
   unsigned int reached;
-  mthread_rwlock_t lock;
+  int checkpoint;
 } ebp_sample_buffer;
 
 typedef struct
 {
   unsigned int relbuf;
-  mthread_rwlock_t lock;
+  int checkpoint;
 } ebp_buffer_indicator;
 
 typedef struct
