@@ -2,57 +2,48 @@
 *  event-based profiling in MINIX 3. 
 */
 
-#include <stdarg.h>
 #include <assert.h>
+#include <err.h>
+#include <errno.h>
+#include <limits.h>
+#include <lib.h>
+#include <paths.h>
+#include <pwd.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
-#include <pwd.h>
+#include <timers.h>
 #include <unistd.h>
-#include <limits.h>
-#include <lib.h>
-#include <minix/config.h>
-#include <minix/com.h>
-#include <minix/const.h>
-#include <minix/type.h>
-#include <minix/ipc.h>
-#include <sys/shm.h>
-#include <minix/rs.h>
-#include <minix/syslib.h>
+
 #include <minix/bitmap.h>
-#include <paths.h>
-#include <minix/sef.h>
+#include <minix/callnr.h>
+#include <minix/com.h>
+#include <minix/config.h>
+#include <minix/const.h>
 #include <minix/dmap.h>
-#include <sys/types.h>
+#include <minix/ipc.h>
+#include <minix/rs.h>
+#include <minix/sef.h>
+#include <minix/syslib.h>
+#include <minix/mthread.h>
+#include <minix/type.h>
+#include <minix/queryparam.h>
+
+#include <sys/ipc.h>
+#include <sys/mman.h>
+#include <sys/shm.h>
 #include <sys/stat.h>
-#include <configfile.h>
+#include <sys/types.h>
 
 #include <machine/archtypes.h>
-#include <timers.h>
-#include <err.h>
 
 #include "config.h"
 #include "proto.h"
 
-#include <minix/mthread.h>
-
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <unistd.h>
-#include <lib.h>
 #include <minix/ebprofile.h>
-#include <minix/syslib.h>
-#include <minix/callnr.h>
-#include <minix/dmap.h>
 #include <configfile.h>
-#include <minix/rs.h>
-#include <assert.h>
 
-#include <sys/ipc.h>
 
 #define SHMKEY1 0x3451
 #define SHMKEY2 0x3452
@@ -69,8 +60,6 @@
 
 
 PRIVATE char command[4096];
-
-int ebprofiling = 0;
 PRIVATE char *req_label = NULL;
 PRIVATE int req_major = 0;
 PRIVATE int devman_id = 0;
@@ -80,12 +69,12 @@ PRIVATE char *req_script = NULL;
 PRIVATE char *req_config = PATH_CONFIG;
 PRIVATE int custom_config_file = 0;
 
+int ebprofiling = 0;
 ebp_buffers *buffers;
 
 int
 start_ebp_server()
 {
-  printf("startserver 0\n");
   message m;
   int request = RS_UP;
   int result = EXIT_SUCCESS;
@@ -258,9 +247,6 @@ ebp_get (ebp_sample_buffer *buffer)
 void
 alloc_buffers (void)
 {
-
-  fprintf(stdout,"allocB start\n");
-
   buffers = malloc(sizeof(ebp_buffers));
 
   int shmid1, shmid2, shmid3;
