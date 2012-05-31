@@ -1,4 +1,5 @@
-/* Blah
+/* This is the example consumer commandline 
+ * tool for event based profiling
  * in MINIX 3. 
  */
 
@@ -18,6 +19,7 @@ int stop (void);
 void help (void);
 int handle_args (int argc, char *argv[]);
 
+//sigaction(SIGKILL callback = stop() ); // this would be nice, so we can clean up
 
 /* Starts event-based profiling. */
 int
@@ -51,17 +53,15 @@ start ()
   ebp_buffers *buffers;
   ebp_sample_buffer consumer_buffer;
   int reached;
+  int i;
 
-  printf("Starting..\n");
+  printf("Consumption starting.\n");
+
   /* Allocates buffers and start profiling */
   buffers = ebp_start(0xFFF); // test bitmap, profiles everything
 
-  printf("buffers allocated, buffer1 = 0x%x, buffer2 = 0x%x relbuf = 0x%x2\n",buffers->first,buffers->second,buffers->indicator);
+  /* initialize whatever we write to, socket, file or stdout */
 
-  /* Loop consumer, read buffers and write to file or socket */
-  int i;
-
-  /* NEW FILE OR SOCKET MAGIC */
   while (1)
   {
 	reached = ebp_get(&consumer_buffer);
@@ -86,12 +86,10 @@ start ()
 }
 
 /* Stops event-based profiling in MINIX. */
-// TODO pkill process, if exists. probably needs to report back to user what happened
 int
 stop () {
-  printf("Stopping\n");
+  printf("Stopping profiling server.\n");
   ebp_stop();
-  //sigaction(SIGKILL); // Read docs, noobz
   return 0;
 }
 
@@ -104,7 +102,6 @@ help ()
   printf ("  |  ebprofile stop \n");
   printf ("  |  ebprofile [-h] \n");
   printf ("Use ebprofalyze.pl to analyze output file.\n");
-  sleep(1);
   return;
 }
 
