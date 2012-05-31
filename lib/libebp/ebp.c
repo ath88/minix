@@ -308,7 +308,6 @@ probe (int type, int payload)
 void
 handle_ebpctl(message *m)
 {
-        printf("PM:handling ebpctl: %d\n",m->PROS_SERV_BMAP); 
         ebprofiling = m->PROS_SERV_BMAP;
         return;  
 }
