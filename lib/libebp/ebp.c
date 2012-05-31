@@ -305,14 +305,15 @@ probe (int type, int payload)
 
 /* Toggles event-based profiling.
  */
-void
+int
 handle_ebpctl(message *m)
 {
         ebprofiling = m->PROS_SERV_BMAP;
-        return;  
+        return 0;  
 }
 
-void server_probe(message *m)
+void 
+server_probe(message *m)
 {
         if(ebprofiling == 1) 
         {

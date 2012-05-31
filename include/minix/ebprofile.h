@@ -64,7 +64,7 @@ int ebp_get (ebp_sample_buffer *buffer);
 void alloc_buffers (void);
 
 /* serverspace functions */
-void handle_ebpctl();
+int handle_ebpctl(message *m);
 void server_probe(message *m);
 
 #endif /* _TOOL_EBPROF_H */

@@ -113,8 +113,7 @@ PUBLIC int main()
 	{
 #if EBPROFILE
         case PROS_SERVER_CTL:
-                handle_ebpctl(&m_in);
-		result = OK;
+                result = handle_ebpctl(&m_in);
                 break;
 #endif
         case PM_SETUID_REPLY:
