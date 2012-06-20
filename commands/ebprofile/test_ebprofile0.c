@@ -20,7 +20,7 @@ main(int argc, char *argv[])
     printf("trying\n");
 
     sleep(2);
-    probe(1,1);
-    probe(1,2);
+    probe("SQLQuery","Start");
+    probe("SQLQuery","Stop");
   }
 }  

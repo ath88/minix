@@ -1277,8 +1277,8 @@
 #define PROS_BITMAP	m7_i4	
 
 /* Field names for probe */
-#define PROS_TYPE 	m7_i1
-#define PROS_PAYLOAD 	m7_i2
+#define PROS_TYPE 	m7_p1
+#define PROS_PAYLOAD 	m7_p2
 
 /* Field names for controlling profiling in servers */
 #define PROS_SERV_BMAP 	m7_i1

@@ -75,11 +75,21 @@ start ()
 	for (i=0; i< reached; i++)
 	{
            /* Here we would write to a file or a socket or stdout */
-     	printf("m_type = %d, field = %d, payload = %d\n", 
-     	  ((consumer_buffer.sample)[i]).m_type,
-     	  ((consumer_buffer.sample)[i]).field,
-     	  ((consumer_buffer.sample)[i]).payload);
+          if (((consumer_buffer.sample)[i]).m_type == 5633) // use probe
+          {
+     	    printf("%s %s\n", 
+     	      ((consumer_buffer.sample)[i]).typetext,
+     	      ((consumer_buffer.sample)[i]).datatext);
+     	    continue; 
+     	  }
 
+     	  printf("m_type = %d, field = %d, payload = %d, type = '%s', data = '%s'\n", 
+     	    ((consumer_buffer.sample)[i]).m_type,
+     	    ((consumer_buffer.sample)[i]).field,
+     	    ((consumer_buffer.sample)[i]).payload,
+     	    ((consumer_buffer.sample)[i]).typetext,
+     	    ((consumer_buffer.sample)[i]).datatext);
+     	   
 	}
   }
   return 0;
@@ -98,10 +108,9 @@ void
 help ()
 {
   printf ("Event-based profiling:\n");
-  printf ("  |  ebprofile start [-f filename | -n ip:port] [-d]\n");
+  printf ("  |  ebprofile start \n");
   printf ("  |  ebprofile stop \n");
   printf ("  |  ebprofile [-h] \n");
-  printf ("Use ebprofalyze.pl to analyze output file.\n");
   return;
 }
 

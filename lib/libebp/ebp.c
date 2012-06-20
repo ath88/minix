@@ -272,7 +272,7 @@ alloc_buffers (void)
 }
 
 void
-probe (int type, int payload)
+probe (char* type, char* payload)
 {
   int pros_proc_nr = 0;
   minix_rs_lookup("pros", &pros_proc_nr);

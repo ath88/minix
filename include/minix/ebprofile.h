@@ -30,6 +30,8 @@ typedef struct
   endpoint_t m_destination;
   int field; 
   int payload; 
+  char typetext[32];
+  char datatext[32];
 } ebp_m_sample;
 
 typedef struct
@@ -53,7 +55,7 @@ typedef struct
 } ebp_buffers;
 
 /* userspace probe */
-void probe(int type, int payload);
+void probe(char* type, char* payload);
 
 /* userspace consumer functions */
 ebp_buffers *ebp_start (int bitmap);

@@ -132,6 +132,17 @@ void write_buffer(
   buffer->sample[buffer->reached].m_source = m_ptr->m_source;
   buffer->sample[buffer->reached].field = m_ptr->PROS_TYPE;
   buffer->sample[buffer->reached].payload = m_ptr->PROS_PAYLOAD;
+
+  if (m_ptr->m_type == 5633) {
+    int r;
+    r = sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->PROS_TYPE,
+                     getprocnr(), (vir_bytes) buffer->sample[buffer->reached].typetext,
+                     sizeof(char[32]));
+    r = sys_datacopy(m_ptr->m_source, (vir_bytes) m_ptr->PROS_PAYLOAD,
+                     getprocnr(), (vir_bytes) buffer->sample[buffer->reached].datatext,
+                     sizeof(char[32]));
+  } 
+  
   buffer->reached++; 
 
   release(buffer->checkpoint);
